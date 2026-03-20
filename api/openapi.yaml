@@ -1,0 +1,18 @@
+openapi: 3.0.0
+info:
+  title: Nexus Chain API
+  version: 1.0.0
+paths:
+  /ping:
+    get:
+      summary: Ping the service
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
