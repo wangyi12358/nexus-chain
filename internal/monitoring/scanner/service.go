@@ -19,15 +19,15 @@ const (
 )
 
 type BlockScanner struct {
-	db     *ent.Client
-	cfg    *config.Config
-	pub    rabbitmq.Publisher
-	cancel context.CancelFunc
-	wg     sync.WaitGroup
+	db             *ent.Client
+	cfg            *config.Config
+	rabbitmqClient *rabbitmq.Client
+	cancel         context.CancelFunc
+	wg             sync.WaitGroup
 }
 
-func New(db *ent.Client, cfg *config.Config, publisher rabbitmq.Publisher) *BlockScanner {
-	return &BlockScanner{db: db, cfg: cfg, pub: publisher}
+func New(db *ent.Client, cfg *config.Config, client *rabbitmq.Client) *BlockScanner {
+	return &BlockScanner{db: db, cfg: cfg, rabbitmqClient: client}
 }
 
 func StartServer(lc fx.Lifecycle, scanner *BlockScanner) {

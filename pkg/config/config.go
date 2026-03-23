@@ -35,6 +35,7 @@ type (
 		Exchange     string `env:"RABBITMQ_EXCHANGE" env-default:"nexus.events"`
 		ExchangeType string `env:"RABBITMQ_EXCHANGE_TYPE" env-default:"topic"`
 		Durable      bool   `env:"RABBITMQ_DURABLE" env-default:"true"`
+		Queue        string `env:"RABBITMQ_QUEUE" env-default:"nexus.events.queue"`
 	}
 )
 

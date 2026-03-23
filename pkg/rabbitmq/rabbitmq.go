@@ -14,14 +14,16 @@ import (
 )
 
 type Publisher interface {
+	EnsureBinding(ctx context.Context, routingKey string) error
 	PublishEvent(ctx context.Context, routingKey string, payload EventMessage) error
 }
 
 type Client struct {
-	cfg  *config.Config
-	mu   sync.Mutex
-	conn *amqp.Connection
-	ch   *amqp.Channel
+	cfg      *config.Config
+	mu       sync.Mutex
+	conn     *amqp.Connection
+	ch       *amqp.Channel
+	bindings map[string]struct{}
 }
 
 type EventMessage struct {
@@ -41,12 +43,17 @@ type EventMessage struct {
 	PublishedAt     time.Time              `json:"published_at"`
 }
 
-func New(lc fx.Lifecycle, cfg *config.Config) (Publisher, error) {
-	client := &Client{cfg: cfg}
+func New(cfg *config.Config) *Client {
+	return &Client{
+		cfg:      cfg,
+		bindings: make(map[string]struct{}),
+	}
+}
 
+func StartServer(lc fx.Lifecycle, client *Client) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			if !cfg.RabbitMQ.Enabled {
+			if !client.cfg.RabbitMQ.Enabled {
 				return nil
 			}
 			return client.connect()
@@ -55,8 +62,6 @@ func New(lc fx.Lifecycle, cfg *config.Config) (Publisher, error) {
 			return client.Close()
 		},
 	})
-
-	return client, nil
 }
 
 func (c *Client) PublishEvent(ctx context.Context, routingKey string, payload EventMessage) error {
@@ -78,6 +83,8 @@ func (c *Client) PublishEvent(ctx context.Context, routingKey string, payload Ev
 			return fmt.Errorf("publish rabbitmq message after reconnect: %w", retryErr)
 		}
 	}
+
+	fmt.Printf("Published RabbitMQ message to routing key %s: %s\n", routingKey, string(body))
 
 	return nil
 }

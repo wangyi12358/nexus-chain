@@ -41,7 +41,7 @@ func (s *BlockScanner) scanTarget(ctx context.Context, target *shared.EventSubsc
 		}
 
 		for _, vLog := range logs {
-			if err := shared.ProcessHistoricalLog(ctx, s.db, s.pub, target, vLog); err != nil {
+			if err := shared.ProcessHistoricalLog(ctx, s.db, s.rabbitmqClient, target, vLog); err != nil {
 				return fmt.Errorf("handle historical log tx=%s index=%d: %w", vLog.TxHash.Hex(), vLog.Index, err)
 			}
 		}

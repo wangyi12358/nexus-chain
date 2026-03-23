@@ -57,7 +57,7 @@ func (l *EventListener) subscribeOnce(ctx context.Context, sub *shared.EventSubs
 			}
 			return err
 		case vLog := <-logsCh:
-			if err := shared.ProcessRealtimeLog(ctx, l.db, l.publisher, sub, vLog); err != nil {
+			if err := shared.ProcessRealtimeLog(ctx, l.db, l.rabbitmqClient, sub, vLog); err != nil {
 				log.Printf(
 					"failed to handle log for contract=%s event=%s tx=%s log_index=%d: %v",
 					sub.Contract.Address,

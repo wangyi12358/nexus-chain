@@ -14,7 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
-func ProcessRealtimeLog(ctx context.Context, db *ent.Client, publisher rabbitmq.Publisher, sub *EventSubscription, vLog types.Log) error {
+func ProcessRealtimeLog(ctx context.Context, db *ent.Client, client *rabbitmq.Client, sub *EventSubscription, vLog types.Log) error {
 	if vLog.Removed {
 		log.Printf(
 			"skip removed log for contract=%s event=%s tx=%s log_index=%d",
@@ -26,21 +26,21 @@ func ProcessRealtimeLog(ctx context.Context, db *ent.Client, publisher rabbitmq.
 		return nil
 	}
 
-	return processLog(ctx, db, publisher, sub, vLog, "realtime")
+	return processLog(ctx, db, client, sub, vLog, "realtime")
 }
 
-func ProcessHistoricalLog(ctx context.Context, db *ent.Client, publisher rabbitmq.Publisher, sub *EventSubscription, vLog types.Log) error {
+func ProcessHistoricalLog(ctx context.Context, db *ent.Client, client *rabbitmq.Client, sub *EventSubscription, vLog types.Log) error {
 	if vLog.Removed {
 		return nil
 	}
 
-	return processLog(ctx, db, publisher, sub, vLog, "scanner")
+	return processLog(ctx, db, client, sub, vLog, "scanner")
 }
 
 func processLog(
 	ctx context.Context,
 	db *ent.Client,
-	publisher rabbitmq.Publisher,
+	client *rabbitmq.Client,
 	sub *EventSubscription,
 	vLog types.Log,
 	source string,
@@ -63,7 +63,7 @@ func processLog(
 		return nil
 	}
 
-	if err := publisher.PublishEvent(ctx, sub.Event.MqRoutingKey, rabbitmq.EventMessage{
+	if err := client.PublishEvent(ctx, sub.Event.MqRoutingKey, rabbitmq.EventMessage{
 		UID:             uid,
 		EventID:         sub.Event.ID.String(),
 		ChainID:         sub.Contract.ChainID,

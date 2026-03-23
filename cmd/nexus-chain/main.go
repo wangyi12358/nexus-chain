@@ -19,9 +19,10 @@ func main() {
 		fx.Provide(net.NewHTTPServer),
 		fx.Provide(scanner.New),
 		fx.Provide(realtime.New),
+		fx.Invoke(database.RegisterHooks),
+		fx.Invoke(rabbitmq.StartServer),
 		fx.Invoke(realtime.StartServer),
 		fx.Invoke(scanner.StartServer),
-		fx.Invoke(database.RegisterHooks),
 		fx.Invoke(net.StartHTTPServer),
 	).Run()
 }

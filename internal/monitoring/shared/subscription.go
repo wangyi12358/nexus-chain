@@ -10,6 +10,7 @@ import (
 	"nexus-chain/ent/monitorevent"
 	"nexus-chain/pkg/config"
 	ethutil "nexus-chain/pkg/ethereum"
+	"nexus-chain/pkg/rabbitmq"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 )
@@ -24,24 +25,24 @@ type EventSubscription struct {
 	WSURL    string
 }
 
-func LoadRealtimeSubscriptions(ctx context.Context, db *ent.Client, cfg *config.Config) ([]*EventSubscription, error) {
+func LoadRealtimeSubscriptions(ctx context.Context, db *ent.Client, cfg *config.Config, publisher rabbitmq.Publisher) ([]*EventSubscription, error) {
 	wsURL, err := cfg.WsUrl()
 	if err != nil {
 		return nil, err
 	}
 
-	return loadSubscriptions(ctx, db, func(contract *ent.MonitorContract) (string, string, bool, error) {
+	return loadSubscriptions(ctx, db, publisher, func(contract *ent.MonitorContract) (string, string, bool, error) {
 		return "", wsURL, true, nil
 	})
 }
 
-func LoadScanSubscriptions(ctx context.Context, db *ent.Client, cfg *config.Config) ([]*EventSubscription, error) {
+func LoadScanSubscriptions(ctx context.Context, db *ent.Client, cfg *config.Config, publisher rabbitmq.Publisher) ([]*EventSubscription, error) {
 	rpcURL, err := cfg.RpcUrl()
 	if err != nil {
 		return nil, err
 	}
 
-	return loadSubscriptions(ctx, db, func(contract *ent.MonitorContract) (string, string, bool, error) {
+	return loadSubscriptions(ctx, db, publisher, func(contract *ent.MonitorContract) (string, string, bool, error) {
 		return rpcURL, "", true, nil
 	})
 }
@@ -64,6 +65,7 @@ func (s *EventSubscription) RealtimeSignature() string {
 func loadSubscriptions(
 	ctx context.Context,
 	db *ent.Client,
+	publisher rabbitmq.Publisher,
 	resolveNodeURLs func(contract *ent.MonitorContract) (rpcURL, wsURL string, ok bool, err error),
 ) ([]*EventSubscription, error) {
 	contracts, err := db.MonitorContract.Query().
@@ -104,6 +106,9 @@ func loadSubscriptions(
 			if err != nil {
 				log.Printf("skip event %s for contract %s: %v", eventRow.EventName, contract.Address, err)
 				continue
+			}
+			if err := publisher.EnsureBinding(ctx, eventRow.MqRoutingKey); err != nil {
+				return nil, err
 			}
 
 			subscriptions = append(subscriptions, &EventSubscription{

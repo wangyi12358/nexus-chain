@@ -20,13 +20,13 @@ const (
 )
 
 type EventListener struct {
-	db            *ent.Client
-	cfg           *config.Config
-	publisher     rabbitmq.Publisher
-	cancel        context.CancelFunc
-	wg            sync.WaitGroup
-	mu            sync.Mutex
-	subscriptions map[string]*managedSubscription
+	db             *ent.Client
+	cfg            *config.Config
+	rabbitmqClient *rabbitmq.Client
+	cancel         context.CancelFunc
+	wg             sync.WaitGroup
+	mu             sync.Mutex
+	subscriptions  map[string]*managedSubscription
 }
 
 type managedSubscription struct {
@@ -34,12 +34,12 @@ type managedSubscription struct {
 	signature string
 }
 
-func New(db *ent.Client, cfg *config.Config, publisher rabbitmq.Publisher) *EventListener {
+func New(db *ent.Client, cfg *config.Config, client *rabbitmq.Client) *EventListener {
 	return &EventListener{
-		db:            db,
-		cfg:           cfg,
-		publisher:     publisher,
-		subscriptions: make(map[string]*managedSubscription),
+		db:             db,
+		cfg:            cfg,
+		rabbitmqClient: client,
+		subscriptions:  make(map[string]*managedSubscription),
 	}
 }
 
@@ -101,7 +101,7 @@ func (l *EventListener) refreshLoop(ctx context.Context) {
 }
 
 func (l *EventListener) refreshSubscriptions(ctx context.Context, runCtx context.Context) error {
-	desiredSubscriptions, err := shared.LoadRealtimeSubscriptions(ctx, l.db, l.cfg)
+	desiredSubscriptions, err := shared.LoadRealtimeSubscriptions(ctx, l.db, l.cfg, l.rabbitmqClient)
 	if err != nil {
 		return err
 	}
