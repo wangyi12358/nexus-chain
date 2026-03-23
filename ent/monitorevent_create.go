@@ -35,12 +35,6 @@ func (_c *MonitorEventCreate) SetEventName(v string) *MonitorEventCreate {
 	return _c
 }
 
-// SetEventTopic sets the "event_topic" field.
-func (_c *MonitorEventCreate) SetEventTopic(v string) *MonitorEventCreate {
-	_c.mutation.SetEventTopic(v)
-	return _c
-}
-
 // SetMqRoutingKey sets the "mq_routing_key" field.
 func (_c *MonitorEventCreate) SetMqRoutingKey(v string) *MonitorEventCreate {
 	_c.mutation.SetMqRoutingKey(v)
@@ -57,20 +51,6 @@ func (_c *MonitorEventCreate) SetStatus(v int8) *MonitorEventCreate {
 func (_c *MonitorEventCreate) SetNillableStatus(v *int8) *MonitorEventCreate {
 	if v != nil {
 		_c.SetStatus(*v)
-	}
-	return _c
-}
-
-// SetStartBlock sets the "start_block" field.
-func (_c *MonitorEventCreate) SetStartBlock(v int64) *MonitorEventCreate {
-	_c.mutation.SetStartBlock(v)
-	return _c
-}
-
-// SetNillableStartBlock sets the "start_block" field if the given value is not nil.
-func (_c *MonitorEventCreate) SetNillableStartBlock(v *int64) *MonitorEventCreate {
-	if v != nil {
-		_c.SetStartBlock(*v)
 	}
 	return _c
 }
@@ -142,10 +122,6 @@ func (_c *MonitorEventCreate) defaults() {
 		v := monitorevent.DefaultStatus
 		_c.mutation.SetStatus(v)
 	}
-	if _, ok := _c.mutation.StartBlock(); !ok {
-		v := monitorevent.DefaultStartBlock
-		_c.mutation.SetStartBlock(v)
-	}
 	if _, ok := _c.mutation.LastBlock(); !ok {
 		v := monitorevent.DefaultLastBlock
 		_c.mutation.SetLastBlock(v)
@@ -169,14 +145,6 @@ func (_c *MonitorEventCreate) check() error {
 			return &ValidationError{Name: "event_name", err: fmt.Errorf(`ent: validator failed for field "MonitorEvent.event_name": %w`, err)}
 		}
 	}
-	if _, ok := _c.mutation.EventTopic(); !ok {
-		return &ValidationError{Name: "event_topic", err: errors.New(`ent: missing required field "MonitorEvent.event_topic"`)}
-	}
-	if v, ok := _c.mutation.EventTopic(); ok {
-		if err := monitorevent.EventTopicValidator(v); err != nil {
-			return &ValidationError{Name: "event_topic", err: fmt.Errorf(`ent: validator failed for field "MonitorEvent.event_topic": %w`, err)}
-		}
-	}
 	if _, ok := _c.mutation.MqRoutingKey(); !ok {
 		return &ValidationError{Name: "mq_routing_key", err: errors.New(`ent: missing required field "MonitorEvent.mq_routing_key"`)}
 	}
@@ -187,9 +155,6 @@ func (_c *MonitorEventCreate) check() error {
 	}
 	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "MonitorEvent.status"`)}
-	}
-	if _, ok := _c.mutation.StartBlock(); !ok {
-		return &ValidationError{Name: "start_block", err: errors.New(`ent: missing required field "MonitorEvent.start_block"`)}
 	}
 	if _, ok := _c.mutation.LastBlock(); !ok {
 		return &ValidationError{Name: "last_block", err: errors.New(`ent: missing required field "MonitorEvent.last_block"`)}
@@ -238,10 +203,6 @@ func (_c *MonitorEventCreate) createSpec() (*MonitorEvent, *sqlgraph.CreateSpec)
 		_spec.SetField(monitorevent.FieldEventName, field.TypeString, value)
 		_node.EventName = value
 	}
-	if value, ok := _c.mutation.EventTopic(); ok {
-		_spec.SetField(monitorevent.FieldEventTopic, field.TypeString, value)
-		_node.EventTopic = value
-	}
 	if value, ok := _c.mutation.MqRoutingKey(); ok {
 		_spec.SetField(monitorevent.FieldMqRoutingKey, field.TypeString, value)
 		_node.MqRoutingKey = value
@@ -249,10 +210,6 @@ func (_c *MonitorEventCreate) createSpec() (*MonitorEvent, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(monitorevent.FieldStatus, field.TypeInt8, value)
 		_node.Status = value
-	}
-	if value, ok := _c.mutation.StartBlock(); ok {
-		_spec.SetField(monitorevent.FieldStartBlock, field.TypeInt64, value)
-		_node.StartBlock = value
 	}
 	if value, ok := _c.mutation.LastBlock(); ok {
 		_spec.SetField(monitorevent.FieldLastBlock, field.TypeInt64, value)
@@ -334,18 +291,6 @@ func (u *MonitorEventUpsert) UpdateEventName() *MonitorEventUpsert {
 	return u
 }
 
-// SetEventTopic sets the "event_topic" field.
-func (u *MonitorEventUpsert) SetEventTopic(v string) *MonitorEventUpsert {
-	u.Set(monitorevent.FieldEventTopic, v)
-	return u
-}
-
-// UpdateEventTopic sets the "event_topic" field to the value that was provided on create.
-func (u *MonitorEventUpsert) UpdateEventTopic() *MonitorEventUpsert {
-	u.SetExcluded(monitorevent.FieldEventTopic)
-	return u
-}
-
 // SetMqRoutingKey sets the "mq_routing_key" field.
 func (u *MonitorEventUpsert) SetMqRoutingKey(v string) *MonitorEventUpsert {
 	u.Set(monitorevent.FieldMqRoutingKey, v)
@@ -373,24 +318,6 @@ func (u *MonitorEventUpsert) UpdateStatus() *MonitorEventUpsert {
 // AddStatus adds v to the "status" field.
 func (u *MonitorEventUpsert) AddStatus(v int8) *MonitorEventUpsert {
 	u.Add(monitorevent.FieldStatus, v)
-	return u
-}
-
-// SetStartBlock sets the "start_block" field.
-func (u *MonitorEventUpsert) SetStartBlock(v int64) *MonitorEventUpsert {
-	u.Set(monitorevent.FieldStartBlock, v)
-	return u
-}
-
-// UpdateStartBlock sets the "start_block" field to the value that was provided on create.
-func (u *MonitorEventUpsert) UpdateStartBlock() *MonitorEventUpsert {
-	u.SetExcluded(monitorevent.FieldStartBlock)
-	return u
-}
-
-// AddStartBlock adds v to the "start_block" field.
-func (u *MonitorEventUpsert) AddStartBlock(v int64) *MonitorEventUpsert {
-	u.Add(monitorevent.FieldStartBlock, v)
 	return u
 }
 
@@ -488,20 +415,6 @@ func (u *MonitorEventUpsertOne) UpdateEventName() *MonitorEventUpsertOne {
 	})
 }
 
-// SetEventTopic sets the "event_topic" field.
-func (u *MonitorEventUpsertOne) SetEventTopic(v string) *MonitorEventUpsertOne {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.SetEventTopic(v)
-	})
-}
-
-// UpdateEventTopic sets the "event_topic" field to the value that was provided on create.
-func (u *MonitorEventUpsertOne) UpdateEventTopic() *MonitorEventUpsertOne {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.UpdateEventTopic()
-	})
-}
-
 // SetMqRoutingKey sets the "mq_routing_key" field.
 func (u *MonitorEventUpsertOne) SetMqRoutingKey(v string) *MonitorEventUpsertOne {
 	return u.Update(func(s *MonitorEventUpsert) {
@@ -534,27 +447,6 @@ func (u *MonitorEventUpsertOne) AddStatus(v int8) *MonitorEventUpsertOne {
 func (u *MonitorEventUpsertOne) UpdateStatus() *MonitorEventUpsertOne {
 	return u.Update(func(s *MonitorEventUpsert) {
 		s.UpdateStatus()
-	})
-}
-
-// SetStartBlock sets the "start_block" field.
-func (u *MonitorEventUpsertOne) SetStartBlock(v int64) *MonitorEventUpsertOne {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.SetStartBlock(v)
-	})
-}
-
-// AddStartBlock adds v to the "start_block" field.
-func (u *MonitorEventUpsertOne) AddStartBlock(v int64) *MonitorEventUpsertOne {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.AddStartBlock(v)
-	})
-}
-
-// UpdateStartBlock sets the "start_block" field to the value that was provided on create.
-func (u *MonitorEventUpsertOne) UpdateStartBlock() *MonitorEventUpsertOne {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.UpdateStartBlock()
 	})
 }
 
@@ -822,20 +714,6 @@ func (u *MonitorEventUpsertBulk) UpdateEventName() *MonitorEventUpsertBulk {
 	})
 }
 
-// SetEventTopic sets the "event_topic" field.
-func (u *MonitorEventUpsertBulk) SetEventTopic(v string) *MonitorEventUpsertBulk {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.SetEventTopic(v)
-	})
-}
-
-// UpdateEventTopic sets the "event_topic" field to the value that was provided on create.
-func (u *MonitorEventUpsertBulk) UpdateEventTopic() *MonitorEventUpsertBulk {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.UpdateEventTopic()
-	})
-}
-
 // SetMqRoutingKey sets the "mq_routing_key" field.
 func (u *MonitorEventUpsertBulk) SetMqRoutingKey(v string) *MonitorEventUpsertBulk {
 	return u.Update(func(s *MonitorEventUpsert) {
@@ -868,27 +746,6 @@ func (u *MonitorEventUpsertBulk) AddStatus(v int8) *MonitorEventUpsertBulk {
 func (u *MonitorEventUpsertBulk) UpdateStatus() *MonitorEventUpsertBulk {
 	return u.Update(func(s *MonitorEventUpsert) {
 		s.UpdateStatus()
-	})
-}
-
-// SetStartBlock sets the "start_block" field.
-func (u *MonitorEventUpsertBulk) SetStartBlock(v int64) *MonitorEventUpsertBulk {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.SetStartBlock(v)
-	})
-}
-
-// AddStartBlock adds v to the "start_block" field.
-func (u *MonitorEventUpsertBulk) AddStartBlock(v int64) *MonitorEventUpsertBulk {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.AddStartBlock(v)
-	})
-}
-
-// UpdateStartBlock sets the "start_block" field to the value that was provided on create.
-func (u *MonitorEventUpsertBulk) UpdateStartBlock() *MonitorEventUpsertBulk {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.UpdateStartBlock()
 	})
 }
 

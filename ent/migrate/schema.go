@@ -16,8 +16,6 @@ var (
 		{Name: "address", Type: field.TypeString, Unique: true, Size: 42},
 		{Name: "name", Type: field.TypeString, Size: 64},
 		{Name: "abi", Type: field.TypeJSON},
-		{Name: "rpc_url", Type: field.TypeString, Size: 255},
-		{Name: "ws_url", Type: field.TypeString, Size: 255},
 		{Name: "status", Type: field.TypeInt8, Default: 1},
 	}
 	// MonitorContractsTable holds the schema information for the "monitor_contracts" table.
@@ -38,10 +36,8 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "contract_id", Type: field.TypeUUID},
 		{Name: "event_name", Type: field.TypeString, Size: 64},
-		{Name: "event_topic", Type: field.TypeString, Size: 66},
 		{Name: "mq_routing_key", Type: field.TypeString, Size: 64},
 		{Name: "status", Type: field.TypeInt8, Default: 1},
-		{Name: "start_block", Type: field.TypeInt64, Default: 0},
 		{Name: "last_block", Type: field.TypeInt64, Default: 0},
 	}
 	// MonitorEventsTable holds the schema information for the "monitor_events" table.
@@ -51,9 +47,9 @@ var (
 		PrimaryKey: []*schema.Column{MonitorEventsColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "monitorevent_contract_id_event_topic",
+				Name:    "monitorevent_contract_id_event_name",
 				Unique:  true,
-				Columns: []*schema.Column{MonitorEventsColumns[1], MonitorEventsColumns[3]},
+				Columns: []*schema.Column{MonitorEventsColumns[1], MonitorEventsColumns[2]},
 			},
 		},
 	}

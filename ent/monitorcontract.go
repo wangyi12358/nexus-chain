@@ -27,10 +27,6 @@ type MonitorContract struct {
 	Name string `json:"name,omitempty"`
 	// Contract ABI definition
 	Abi json.RawMessage `json:"abi,omitempty"`
-	// RPC URL used for historical log queries
-	RPCURL string `json:"rpc_url,omitempty"`
-	// WebSocket RPC URL used for realtime subscriptions
-	WsURL string `json:"ws_url,omitempty"`
 	// Whether to enable monitoring (0: stop, 1: run)
 	Status       int8 `json:"status,omitempty"`
 	selectValues sql.SelectValues
@@ -45,7 +41,7 @@ func (*MonitorContract) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case monitorcontract.FieldChainID, monitorcontract.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case monitorcontract.FieldAddress, monitorcontract.FieldName, monitorcontract.FieldRPCURL, monitorcontract.FieldWsURL:
+		case monitorcontract.FieldAddress, monitorcontract.FieldName:
 			values[i] = new(sql.NullString)
 		case monitorcontract.FieldID:
 			values[i] = new(uuid.UUID)
@@ -95,18 +91,6 @@ func (_m *MonitorContract) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &_m.Abi); err != nil {
 					return fmt.Errorf("unmarshal field abi: %w", err)
 				}
-			}
-		case monitorcontract.FieldRPCURL:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field rpc_url", values[i])
-			} else if value.Valid {
-				_m.RPCURL = value.String
-			}
-		case monitorcontract.FieldWsURL:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field ws_url", values[i])
-			} else if value.Valid {
-				_m.WsURL = value.String
 			}
 		case monitorcontract.FieldStatus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -161,12 +145,6 @@ func (_m *MonitorContract) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("abi=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Abi))
-	builder.WriteString(", ")
-	builder.WriteString("rpc_url=")
-	builder.WriteString(_m.RPCURL)
-	builder.WriteString(", ")
-	builder.WriteString("ws_url=")
-	builder.WriteString(_m.WsURL)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Status))

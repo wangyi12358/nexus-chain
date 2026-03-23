@@ -23,18 +23,12 @@ func (MonitorEvent) Fields() []ent.Field {
 		field.String("event_name").
 			MaxLen(64).
 			Comment("Event name"),
-		field.String("event_topic").
-			MaxLen(66).
-			Comment("Event hash (Topic0)"),
 		field.String("mq_routing_key").
 			MaxLen(64).
 			Comment("MQ routing key for this event"),
 		field.Int8("status").
 			Default(1).
 			Comment("Whether to enable monitoring (0: stop, 1: run)"),
-		field.Int64("start_block").
-			Default(0).
-			Comment("Initial block number to start scanning from"),
 		field.Int64("last_block").
 			Default(0).
 			Comment("Last processed block number"),
@@ -44,7 +38,7 @@ func (MonitorEvent) Fields() []ent.Field {
 // Indexes of the MonitorEvent.
 func (MonitorEvent) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("contract_id", "event_topic").
+		index.Fields("contract_id", "event_name").
 			Unique(),
 	}
 }

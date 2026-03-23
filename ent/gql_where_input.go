@@ -71,36 +71,6 @@ type MonitorContractWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
-	// "rpc_url" field predicates.
-	RPCURL             *string  `json:"rpcURL,omitempty"`
-	RPCURLNEQ          *string  `json:"rpcURLNEQ,omitempty"`
-	RPCURLIn           []string `json:"rpcURLIn,omitempty"`
-	RPCURLNotIn        []string `json:"rpcURLNotIn,omitempty"`
-	RPCURLGT           *string  `json:"rpcURLGT,omitempty"`
-	RPCURLGTE          *string  `json:"rpcURLGTE,omitempty"`
-	RPCURLLT           *string  `json:"rpcURLLT,omitempty"`
-	RPCURLLTE          *string  `json:"rpcURLLTE,omitempty"`
-	RPCURLContains     *string  `json:"rpcURLContains,omitempty"`
-	RPCURLHasPrefix    *string  `json:"rpcURLHasPrefix,omitempty"`
-	RPCURLHasSuffix    *string  `json:"rpcURLHasSuffix,omitempty"`
-	RPCURLEqualFold    *string  `json:"rpcURLEqualFold,omitempty"`
-	RPCURLContainsFold *string  `json:"rpcURLContainsFold,omitempty"`
-
-	// "ws_url" field predicates.
-	WsURL             *string  `json:"wsURL,omitempty"`
-	WsURLNEQ          *string  `json:"wsURLNEQ,omitempty"`
-	WsURLIn           []string `json:"wsURLIn,omitempty"`
-	WsURLNotIn        []string `json:"wsURLNotIn,omitempty"`
-	WsURLGT           *string  `json:"wsURLGT,omitempty"`
-	WsURLGTE          *string  `json:"wsURLGTE,omitempty"`
-	WsURLLT           *string  `json:"wsURLLT,omitempty"`
-	WsURLLTE          *string  `json:"wsURLLTE,omitempty"`
-	WsURLContains     *string  `json:"wsURLContains,omitempty"`
-	WsURLHasPrefix    *string  `json:"wsURLHasPrefix,omitempty"`
-	WsURLHasSuffix    *string  `json:"wsURLHasSuffix,omitempty"`
-	WsURLEqualFold    *string  `json:"wsURLEqualFold,omitempty"`
-	WsURLContainsFold *string  `json:"wsURLContainsFold,omitempty"`
-
 	// "status" field predicates.
 	Status      *int8  `json:"status,omitempty"`
 	StatusNEQ   *int8  `json:"statusNEQ,omitempty"`
@@ -309,84 +279,6 @@ func (i *MonitorContractWhereInput) P() (predicate.MonitorContract, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, monitorcontract.NameContainsFold(*i.NameContainsFold))
 	}
-	if i.RPCURL != nil {
-		predicates = append(predicates, monitorcontract.RPCURLEQ(*i.RPCURL))
-	}
-	if i.RPCURLNEQ != nil {
-		predicates = append(predicates, monitorcontract.RPCURLNEQ(*i.RPCURLNEQ))
-	}
-	if len(i.RPCURLIn) > 0 {
-		predicates = append(predicates, monitorcontract.RPCURLIn(i.RPCURLIn...))
-	}
-	if len(i.RPCURLNotIn) > 0 {
-		predicates = append(predicates, monitorcontract.RPCURLNotIn(i.RPCURLNotIn...))
-	}
-	if i.RPCURLGT != nil {
-		predicates = append(predicates, monitorcontract.RPCURLGT(*i.RPCURLGT))
-	}
-	if i.RPCURLGTE != nil {
-		predicates = append(predicates, monitorcontract.RPCURLGTE(*i.RPCURLGTE))
-	}
-	if i.RPCURLLT != nil {
-		predicates = append(predicates, monitorcontract.RPCURLLT(*i.RPCURLLT))
-	}
-	if i.RPCURLLTE != nil {
-		predicates = append(predicates, monitorcontract.RPCURLLTE(*i.RPCURLLTE))
-	}
-	if i.RPCURLContains != nil {
-		predicates = append(predicates, monitorcontract.RPCURLContains(*i.RPCURLContains))
-	}
-	if i.RPCURLHasPrefix != nil {
-		predicates = append(predicates, monitorcontract.RPCURLHasPrefix(*i.RPCURLHasPrefix))
-	}
-	if i.RPCURLHasSuffix != nil {
-		predicates = append(predicates, monitorcontract.RPCURLHasSuffix(*i.RPCURLHasSuffix))
-	}
-	if i.RPCURLEqualFold != nil {
-		predicates = append(predicates, monitorcontract.RPCURLEqualFold(*i.RPCURLEqualFold))
-	}
-	if i.RPCURLContainsFold != nil {
-		predicates = append(predicates, monitorcontract.RPCURLContainsFold(*i.RPCURLContainsFold))
-	}
-	if i.WsURL != nil {
-		predicates = append(predicates, monitorcontract.WsURLEQ(*i.WsURL))
-	}
-	if i.WsURLNEQ != nil {
-		predicates = append(predicates, monitorcontract.WsURLNEQ(*i.WsURLNEQ))
-	}
-	if len(i.WsURLIn) > 0 {
-		predicates = append(predicates, monitorcontract.WsURLIn(i.WsURLIn...))
-	}
-	if len(i.WsURLNotIn) > 0 {
-		predicates = append(predicates, monitorcontract.WsURLNotIn(i.WsURLNotIn...))
-	}
-	if i.WsURLGT != nil {
-		predicates = append(predicates, monitorcontract.WsURLGT(*i.WsURLGT))
-	}
-	if i.WsURLGTE != nil {
-		predicates = append(predicates, monitorcontract.WsURLGTE(*i.WsURLGTE))
-	}
-	if i.WsURLLT != nil {
-		predicates = append(predicates, monitorcontract.WsURLLT(*i.WsURLLT))
-	}
-	if i.WsURLLTE != nil {
-		predicates = append(predicates, monitorcontract.WsURLLTE(*i.WsURLLTE))
-	}
-	if i.WsURLContains != nil {
-		predicates = append(predicates, monitorcontract.WsURLContains(*i.WsURLContains))
-	}
-	if i.WsURLHasPrefix != nil {
-		predicates = append(predicates, monitorcontract.WsURLHasPrefix(*i.WsURLHasPrefix))
-	}
-	if i.WsURLHasSuffix != nil {
-		predicates = append(predicates, monitorcontract.WsURLHasSuffix(*i.WsURLHasSuffix))
-	}
-	if i.WsURLEqualFold != nil {
-		predicates = append(predicates, monitorcontract.WsURLEqualFold(*i.WsURLEqualFold))
-	}
-	if i.WsURLContainsFold != nil {
-		predicates = append(predicates, monitorcontract.WsURLContainsFold(*i.WsURLContainsFold))
-	}
 	if i.Status != nil {
 		predicates = append(predicates, monitorcontract.StatusEQ(*i.Status))
 	}
@@ -464,21 +356,6 @@ type MonitorEventWhereInput struct {
 	EventNameEqualFold    *string  `json:"eventNameEqualFold,omitempty"`
 	EventNameContainsFold *string  `json:"eventNameContainsFold,omitempty"`
 
-	// "event_topic" field predicates.
-	EventTopic             *string  `json:"eventTopic,omitempty"`
-	EventTopicNEQ          *string  `json:"eventTopicNEQ,omitempty"`
-	EventTopicIn           []string `json:"eventTopicIn,omitempty"`
-	EventTopicNotIn        []string `json:"eventTopicNotIn,omitempty"`
-	EventTopicGT           *string  `json:"eventTopicGT,omitempty"`
-	EventTopicGTE          *string  `json:"eventTopicGTE,omitempty"`
-	EventTopicLT           *string  `json:"eventTopicLT,omitempty"`
-	EventTopicLTE          *string  `json:"eventTopicLTE,omitempty"`
-	EventTopicContains     *string  `json:"eventTopicContains,omitempty"`
-	EventTopicHasPrefix    *string  `json:"eventTopicHasPrefix,omitempty"`
-	EventTopicHasSuffix    *string  `json:"eventTopicHasSuffix,omitempty"`
-	EventTopicEqualFold    *string  `json:"eventTopicEqualFold,omitempty"`
-	EventTopicContainsFold *string  `json:"eventTopicContainsFold,omitempty"`
-
 	// "mq_routing_key" field predicates.
 	MqRoutingKey             *string  `json:"mqRoutingKey,omitempty"`
 	MqRoutingKeyNEQ          *string  `json:"mqRoutingKeyNEQ,omitempty"`
@@ -503,16 +380,6 @@ type MonitorEventWhereInput struct {
 	StatusGTE   *int8  `json:"statusGTE,omitempty"`
 	StatusLT    *int8  `json:"statusLT,omitempty"`
 	StatusLTE   *int8  `json:"statusLTE,omitempty"`
-
-	// "start_block" field predicates.
-	StartBlock      *int64  `json:"startBlock,omitempty"`
-	StartBlockNEQ   *int64  `json:"startBlockNEQ,omitempty"`
-	StartBlockIn    []int64 `json:"startBlockIn,omitempty"`
-	StartBlockNotIn []int64 `json:"startBlockNotIn,omitempty"`
-	StartBlockGT    *int64  `json:"startBlockGT,omitempty"`
-	StartBlockGTE   *int64  `json:"startBlockGTE,omitempty"`
-	StartBlockLT    *int64  `json:"startBlockLT,omitempty"`
-	StartBlockLTE   *int64  `json:"startBlockLTE,omitempty"`
 
 	// "last_block" field predicates.
 	LastBlock      *int64  `json:"lastBlock,omitempty"`
@@ -683,45 +550,6 @@ func (i *MonitorEventWhereInput) P() (predicate.MonitorEvent, error) {
 	if i.EventNameContainsFold != nil {
 		predicates = append(predicates, monitorevent.EventNameContainsFold(*i.EventNameContainsFold))
 	}
-	if i.EventTopic != nil {
-		predicates = append(predicates, monitorevent.EventTopicEQ(*i.EventTopic))
-	}
-	if i.EventTopicNEQ != nil {
-		predicates = append(predicates, monitorevent.EventTopicNEQ(*i.EventTopicNEQ))
-	}
-	if len(i.EventTopicIn) > 0 {
-		predicates = append(predicates, monitorevent.EventTopicIn(i.EventTopicIn...))
-	}
-	if len(i.EventTopicNotIn) > 0 {
-		predicates = append(predicates, monitorevent.EventTopicNotIn(i.EventTopicNotIn...))
-	}
-	if i.EventTopicGT != nil {
-		predicates = append(predicates, monitorevent.EventTopicGT(*i.EventTopicGT))
-	}
-	if i.EventTopicGTE != nil {
-		predicates = append(predicates, monitorevent.EventTopicGTE(*i.EventTopicGTE))
-	}
-	if i.EventTopicLT != nil {
-		predicates = append(predicates, monitorevent.EventTopicLT(*i.EventTopicLT))
-	}
-	if i.EventTopicLTE != nil {
-		predicates = append(predicates, monitorevent.EventTopicLTE(*i.EventTopicLTE))
-	}
-	if i.EventTopicContains != nil {
-		predicates = append(predicates, monitorevent.EventTopicContains(*i.EventTopicContains))
-	}
-	if i.EventTopicHasPrefix != nil {
-		predicates = append(predicates, monitorevent.EventTopicHasPrefix(*i.EventTopicHasPrefix))
-	}
-	if i.EventTopicHasSuffix != nil {
-		predicates = append(predicates, monitorevent.EventTopicHasSuffix(*i.EventTopicHasSuffix))
-	}
-	if i.EventTopicEqualFold != nil {
-		predicates = append(predicates, monitorevent.EventTopicEqualFold(*i.EventTopicEqualFold))
-	}
-	if i.EventTopicContainsFold != nil {
-		predicates = append(predicates, monitorevent.EventTopicContainsFold(*i.EventTopicContainsFold))
-	}
 	if i.MqRoutingKey != nil {
 		predicates = append(predicates, monitorevent.MqRoutingKeyEQ(*i.MqRoutingKey))
 	}
@@ -784,30 +612,6 @@ func (i *MonitorEventWhereInput) P() (predicate.MonitorEvent, error) {
 	}
 	if i.StatusLTE != nil {
 		predicates = append(predicates, monitorevent.StatusLTE(*i.StatusLTE))
-	}
-	if i.StartBlock != nil {
-		predicates = append(predicates, monitorevent.StartBlockEQ(*i.StartBlock))
-	}
-	if i.StartBlockNEQ != nil {
-		predicates = append(predicates, monitorevent.StartBlockNEQ(*i.StartBlockNEQ))
-	}
-	if len(i.StartBlockIn) > 0 {
-		predicates = append(predicates, monitorevent.StartBlockIn(i.StartBlockIn...))
-	}
-	if len(i.StartBlockNotIn) > 0 {
-		predicates = append(predicates, monitorevent.StartBlockNotIn(i.StartBlockNotIn...))
-	}
-	if i.StartBlockGT != nil {
-		predicates = append(predicates, monitorevent.StartBlockGT(*i.StartBlockGT))
-	}
-	if i.StartBlockGTE != nil {
-		predicates = append(predicates, monitorevent.StartBlockGTE(*i.StartBlockGTE))
-	}
-	if i.StartBlockLT != nil {
-		predicates = append(predicates, monitorevent.StartBlockLT(*i.StartBlockLT))
-	}
-	if i.StartBlockLTE != nil {
-		predicates = append(predicates, monitorevent.StartBlockLTE(*i.StartBlockLTE))
 	}
 	if i.LastBlock != nil {
 		predicates = append(predicates, monitorevent.LastBlockEQ(*i.LastBlock))

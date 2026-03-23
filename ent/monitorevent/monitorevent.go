@@ -16,14 +16,10 @@ const (
 	FieldContractID = "contract_id"
 	// FieldEventName holds the string denoting the event_name field in the database.
 	FieldEventName = "event_name"
-	// FieldEventTopic holds the string denoting the event_topic field in the database.
-	FieldEventTopic = "event_topic"
 	// FieldMqRoutingKey holds the string denoting the mq_routing_key field in the database.
 	FieldMqRoutingKey = "mq_routing_key"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldStartBlock holds the string denoting the start_block field in the database.
-	FieldStartBlock = "start_block"
 	// FieldLastBlock holds the string denoting the last_block field in the database.
 	FieldLastBlock = "last_block"
 	// Table holds the table name of the monitorevent in the database.
@@ -35,10 +31,8 @@ var Columns = []string{
 	FieldID,
 	FieldContractID,
 	FieldEventName,
-	FieldEventTopic,
 	FieldMqRoutingKey,
 	FieldStatus,
-	FieldStartBlock,
 	FieldLastBlock,
 }
 
@@ -55,14 +49,10 @@ func ValidColumn(column string) bool {
 var (
 	// EventNameValidator is a validator for the "event_name" field. It is called by the builders before save.
 	EventNameValidator func(string) error
-	// EventTopicValidator is a validator for the "event_topic" field. It is called by the builders before save.
-	EventTopicValidator func(string) error
 	// MqRoutingKeyValidator is a validator for the "mq_routing_key" field. It is called by the builders before save.
 	MqRoutingKeyValidator func(string) error
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int8
-	// DefaultStartBlock holds the default value on creation for the "start_block" field.
-	DefaultStartBlock int64
 	// DefaultLastBlock holds the default value on creation for the "last_block" field.
 	DefaultLastBlock int64
 	// DefaultID holds the default value on creation for the "id" field.
@@ -87,11 +77,6 @@ func ByEventName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEventName, opts...).ToFunc()
 }
 
-// ByEventTopic orders the results by the event_topic field.
-func ByEventTopic(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEventTopic, opts...).ToFunc()
-}
-
 // ByMqRoutingKey orders the results by the mq_routing_key field.
 func ByMqRoutingKey(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMqRoutingKey, opts...).ToFunc()
@@ -100,11 +85,6 @@ func ByMqRoutingKey(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
-}
-
-// ByStartBlock orders the results by the start_block field.
-func ByStartBlock(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldStartBlock, opts...).ToFunc()
 }
 
 // ByLastBlock orders the results by the last_block field.

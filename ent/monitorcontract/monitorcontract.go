@@ -20,10 +20,6 @@ const (
 	FieldName = "name"
 	// FieldAbi holds the string denoting the abi field in the database.
 	FieldAbi = "abi"
-	// FieldRPCURL holds the string denoting the rpc_url field in the database.
-	FieldRPCURL = "rpc_url"
-	// FieldWsURL holds the string denoting the ws_url field in the database.
-	FieldWsURL = "ws_url"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// Table holds the table name of the monitorcontract in the database.
@@ -37,8 +33,6 @@ var Columns = []string{
 	FieldAddress,
 	FieldName,
 	FieldAbi,
-	FieldRPCURL,
-	FieldWsURL,
 	FieldStatus,
 }
 
@@ -57,10 +51,6 @@ var (
 	AddressValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
-	// RPCURLValidator is a validator for the "rpc_url" field. It is called by the builders before save.
-	RPCURLValidator func(string) error
-	// WsURLValidator is a validator for the "ws_url" field. It is called by the builders before save.
-	WsURLValidator func(string) error
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int8
 	// DefaultID holds the default value on creation for the "id" field.
@@ -88,16 +78,6 @@ func ByAddress(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
-}
-
-// ByRPCURL orders the results by the rpc_url field.
-func ByRPCURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRPCURL, opts...).ToFunc()
-}
-
-// ByWsURL orders the results by the ws_url field.
-func ByWsURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldWsURL, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

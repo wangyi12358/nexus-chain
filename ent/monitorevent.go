@@ -22,14 +22,10 @@ type MonitorEvent struct {
 	ContractID uuid.UUID `json:"contract_id,omitempty"`
 	// Event name
 	EventName string `json:"event_name,omitempty"`
-	// Event hash (Topic0)
-	EventTopic string `json:"event_topic,omitempty"`
 	// MQ routing key for this event
 	MqRoutingKey string `json:"mq_routing_key,omitempty"`
 	// Whether to enable monitoring (0: stop, 1: run)
 	Status int8 `json:"status,omitempty"`
-	// Initial block number to start scanning from
-	StartBlock int64 `json:"start_block,omitempty"`
 	// Last processed block number
 	LastBlock    int64 `json:"last_block,omitempty"`
 	selectValues sql.SelectValues
@@ -40,9 +36,9 @@ func (*MonitorEvent) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case monitorevent.FieldStatus, monitorevent.FieldStartBlock, monitorevent.FieldLastBlock:
+		case monitorevent.FieldStatus, monitorevent.FieldLastBlock:
 			values[i] = new(sql.NullInt64)
-		case monitorevent.FieldEventName, monitorevent.FieldEventTopic, monitorevent.FieldMqRoutingKey:
+		case monitorevent.FieldEventName, monitorevent.FieldMqRoutingKey:
 			values[i] = new(sql.NullString)
 		case monitorevent.FieldID, monitorevent.FieldContractID:
 			values[i] = new(uuid.UUID)
@@ -79,12 +75,6 @@ func (_m *MonitorEvent) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.EventName = value.String
 			}
-		case monitorevent.FieldEventTopic:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field event_topic", values[i])
-			} else if value.Valid {
-				_m.EventTopic = value.String
-			}
 		case monitorevent.FieldMqRoutingKey:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field mq_routing_key", values[i])
@@ -96,12 +86,6 @@ func (_m *MonitorEvent) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				_m.Status = int8(value.Int64)
-			}
-		case monitorevent.FieldStartBlock:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field start_block", values[i])
-			} else if value.Valid {
-				_m.StartBlock = value.Int64
 			}
 		case monitorevent.FieldLastBlock:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -151,17 +135,11 @@ func (_m *MonitorEvent) String() string {
 	builder.WriteString("event_name=")
 	builder.WriteString(_m.EventName)
 	builder.WriteString(", ")
-	builder.WriteString("event_topic=")
-	builder.WriteString(_m.EventTopic)
-	builder.WriteString(", ")
 	builder.WriteString("mq_routing_key=")
 	builder.WriteString(_m.MqRoutingKey)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Status))
-	builder.WriteString(", ")
-	builder.WriteString("start_block=")
-	builder.WriteString(fmt.Sprintf("%v", _m.StartBlock))
 	builder.WriteString(", ")
 	builder.WriteString("last_block=")
 	builder.WriteString(fmt.Sprintf("%v", _m.LastBlock))

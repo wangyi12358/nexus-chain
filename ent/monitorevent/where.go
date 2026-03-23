@@ -64,11 +64,6 @@ func EventName(v string) predicate.MonitorEvent {
 	return predicate.MonitorEvent(sql.FieldEQ(FieldEventName, v))
 }
 
-// EventTopic applies equality check predicate on the "event_topic" field. It's identical to EventTopicEQ.
-func EventTopic(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldEQ(FieldEventTopic, v))
-}
-
 // MqRoutingKey applies equality check predicate on the "mq_routing_key" field. It's identical to MqRoutingKeyEQ.
 func MqRoutingKey(v string) predicate.MonitorEvent {
 	return predicate.MonitorEvent(sql.FieldEQ(FieldMqRoutingKey, v))
@@ -77,11 +72,6 @@ func MqRoutingKey(v string) predicate.MonitorEvent {
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
 func Status(v int8) predicate.MonitorEvent {
 	return predicate.MonitorEvent(sql.FieldEQ(FieldStatus, v))
-}
-
-// StartBlock applies equality check predicate on the "start_block" field. It's identical to StartBlockEQ.
-func StartBlock(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldEQ(FieldStartBlock, v))
 }
 
 // LastBlock applies equality check predicate on the "last_block" field. It's identical to LastBlockEQ.
@@ -194,71 +184,6 @@ func EventNameContainsFold(v string) predicate.MonitorEvent {
 	return predicate.MonitorEvent(sql.FieldContainsFold(FieldEventName, v))
 }
 
-// EventTopicEQ applies the EQ predicate on the "event_topic" field.
-func EventTopicEQ(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldEQ(FieldEventTopic, v))
-}
-
-// EventTopicNEQ applies the NEQ predicate on the "event_topic" field.
-func EventTopicNEQ(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldNEQ(FieldEventTopic, v))
-}
-
-// EventTopicIn applies the In predicate on the "event_topic" field.
-func EventTopicIn(vs ...string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldIn(FieldEventTopic, vs...))
-}
-
-// EventTopicNotIn applies the NotIn predicate on the "event_topic" field.
-func EventTopicNotIn(vs ...string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldNotIn(FieldEventTopic, vs...))
-}
-
-// EventTopicGT applies the GT predicate on the "event_topic" field.
-func EventTopicGT(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldGT(FieldEventTopic, v))
-}
-
-// EventTopicGTE applies the GTE predicate on the "event_topic" field.
-func EventTopicGTE(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldGTE(FieldEventTopic, v))
-}
-
-// EventTopicLT applies the LT predicate on the "event_topic" field.
-func EventTopicLT(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldLT(FieldEventTopic, v))
-}
-
-// EventTopicLTE applies the LTE predicate on the "event_topic" field.
-func EventTopicLTE(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldLTE(FieldEventTopic, v))
-}
-
-// EventTopicContains applies the Contains predicate on the "event_topic" field.
-func EventTopicContains(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldContains(FieldEventTopic, v))
-}
-
-// EventTopicHasPrefix applies the HasPrefix predicate on the "event_topic" field.
-func EventTopicHasPrefix(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldHasPrefix(FieldEventTopic, v))
-}
-
-// EventTopicHasSuffix applies the HasSuffix predicate on the "event_topic" field.
-func EventTopicHasSuffix(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldHasSuffix(FieldEventTopic, v))
-}
-
-// EventTopicEqualFold applies the EqualFold predicate on the "event_topic" field.
-func EventTopicEqualFold(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldEqualFold(FieldEventTopic, v))
-}
-
-// EventTopicContainsFold applies the ContainsFold predicate on the "event_topic" field.
-func EventTopicContainsFold(v string) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldContainsFold(FieldEventTopic, v))
-}
-
 // MqRoutingKeyEQ applies the EQ predicate on the "mq_routing_key" field.
 func MqRoutingKeyEQ(v string) predicate.MonitorEvent {
 	return predicate.MonitorEvent(sql.FieldEQ(FieldMqRoutingKey, v))
@@ -362,46 +287,6 @@ func StatusLT(v int8) predicate.MonitorEvent {
 // StatusLTE applies the LTE predicate on the "status" field.
 func StatusLTE(v int8) predicate.MonitorEvent {
 	return predicate.MonitorEvent(sql.FieldLTE(FieldStatus, v))
-}
-
-// StartBlockEQ applies the EQ predicate on the "start_block" field.
-func StartBlockEQ(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldEQ(FieldStartBlock, v))
-}
-
-// StartBlockNEQ applies the NEQ predicate on the "start_block" field.
-func StartBlockNEQ(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldNEQ(FieldStartBlock, v))
-}
-
-// StartBlockIn applies the In predicate on the "start_block" field.
-func StartBlockIn(vs ...int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldIn(FieldStartBlock, vs...))
-}
-
-// StartBlockNotIn applies the NotIn predicate on the "start_block" field.
-func StartBlockNotIn(vs ...int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldNotIn(FieldStartBlock, vs...))
-}
-
-// StartBlockGT applies the GT predicate on the "start_block" field.
-func StartBlockGT(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldGT(FieldStartBlock, v))
-}
-
-// StartBlockGTE applies the GTE predicate on the "start_block" field.
-func StartBlockGTE(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldGTE(FieldStartBlock, v))
-}
-
-// StartBlockLT applies the LT predicate on the "start_block" field.
-func StartBlockLT(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldLT(FieldStartBlock, v))
-}
-
-// StartBlockLTE applies the LTE predicate on the "start_block" field.
-func StartBlockLTE(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldLTE(FieldStartBlock, v))
 }
 
 // LastBlockEQ applies the EQ predicate on the "last_block" field.

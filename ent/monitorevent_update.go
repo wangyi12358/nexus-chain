@@ -57,20 +57,6 @@ func (_u *MonitorEventUpdate) SetNillableEventName(v *string) *MonitorEventUpdat
 	return _u
 }
 
-// SetEventTopic sets the "event_topic" field.
-func (_u *MonitorEventUpdate) SetEventTopic(v string) *MonitorEventUpdate {
-	_u.mutation.SetEventTopic(v)
-	return _u
-}
-
-// SetNillableEventTopic sets the "event_topic" field if the given value is not nil.
-func (_u *MonitorEventUpdate) SetNillableEventTopic(v *string) *MonitorEventUpdate {
-	if v != nil {
-		_u.SetEventTopic(*v)
-	}
-	return _u
-}
-
 // SetMqRoutingKey sets the "mq_routing_key" field.
 func (_u *MonitorEventUpdate) SetMqRoutingKey(v string) *MonitorEventUpdate {
 	_u.mutation.SetMqRoutingKey(v)
@@ -103,27 +89,6 @@ func (_u *MonitorEventUpdate) SetNillableStatus(v *int8) *MonitorEventUpdate {
 // AddStatus adds value to the "status" field.
 func (_u *MonitorEventUpdate) AddStatus(v int8) *MonitorEventUpdate {
 	_u.mutation.AddStatus(v)
-	return _u
-}
-
-// SetStartBlock sets the "start_block" field.
-func (_u *MonitorEventUpdate) SetStartBlock(v int64) *MonitorEventUpdate {
-	_u.mutation.ResetStartBlock()
-	_u.mutation.SetStartBlock(v)
-	return _u
-}
-
-// SetNillableStartBlock sets the "start_block" field if the given value is not nil.
-func (_u *MonitorEventUpdate) SetNillableStartBlock(v *int64) *MonitorEventUpdate {
-	if v != nil {
-		_u.SetStartBlock(*v)
-	}
-	return _u
-}
-
-// AddStartBlock adds value to the "start_block" field.
-func (_u *MonitorEventUpdate) AddStartBlock(v int64) *MonitorEventUpdate {
-	_u.mutation.AddStartBlock(v)
 	return _u
 }
 
@@ -187,11 +152,6 @@ func (_u *MonitorEventUpdate) check() error {
 			return &ValidationError{Name: "event_name", err: fmt.Errorf(`ent: validator failed for field "MonitorEvent.event_name": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.EventTopic(); ok {
-		if err := monitorevent.EventTopicValidator(v); err != nil {
-			return &ValidationError{Name: "event_topic", err: fmt.Errorf(`ent: validator failed for field "MonitorEvent.event_topic": %w`, err)}
-		}
-	}
 	if v, ok := _u.mutation.MqRoutingKey(); ok {
 		if err := monitorevent.MqRoutingKeyValidator(v); err != nil {
 			return &ValidationError{Name: "mq_routing_key", err: fmt.Errorf(`ent: validator failed for field "MonitorEvent.mq_routing_key": %w`, err)}
@@ -224,9 +184,6 @@ func (_u *MonitorEventUpdate) sqlSave(ctx context.Context) (_node int, err error
 	if value, ok := _u.mutation.EventName(); ok {
 		_spec.SetField(monitorevent.FieldEventName, field.TypeString, value)
 	}
-	if value, ok := _u.mutation.EventTopic(); ok {
-		_spec.SetField(monitorevent.FieldEventTopic, field.TypeString, value)
-	}
 	if value, ok := _u.mutation.MqRoutingKey(); ok {
 		_spec.SetField(monitorevent.FieldMqRoutingKey, field.TypeString, value)
 	}
@@ -235,12 +192,6 @@ func (_u *MonitorEventUpdate) sqlSave(ctx context.Context) (_node int, err error
 	}
 	if value, ok := _u.mutation.AddedStatus(); ok {
 		_spec.AddField(monitorevent.FieldStatus, field.TypeInt8, value)
-	}
-	if value, ok := _u.mutation.StartBlock(); ok {
-		_spec.SetField(monitorevent.FieldStartBlock, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedStartBlock(); ok {
-		_spec.AddField(monitorevent.FieldStartBlock, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.LastBlock(); ok {
 		_spec.SetField(monitorevent.FieldLastBlock, field.TypeInt64, value)
@@ -298,20 +249,6 @@ func (_u *MonitorEventUpdateOne) SetNillableEventName(v *string) *MonitorEventUp
 	return _u
 }
 
-// SetEventTopic sets the "event_topic" field.
-func (_u *MonitorEventUpdateOne) SetEventTopic(v string) *MonitorEventUpdateOne {
-	_u.mutation.SetEventTopic(v)
-	return _u
-}
-
-// SetNillableEventTopic sets the "event_topic" field if the given value is not nil.
-func (_u *MonitorEventUpdateOne) SetNillableEventTopic(v *string) *MonitorEventUpdateOne {
-	if v != nil {
-		_u.SetEventTopic(*v)
-	}
-	return _u
-}
-
 // SetMqRoutingKey sets the "mq_routing_key" field.
 func (_u *MonitorEventUpdateOne) SetMqRoutingKey(v string) *MonitorEventUpdateOne {
 	_u.mutation.SetMqRoutingKey(v)
@@ -344,27 +281,6 @@ func (_u *MonitorEventUpdateOne) SetNillableStatus(v *int8) *MonitorEventUpdateO
 // AddStatus adds value to the "status" field.
 func (_u *MonitorEventUpdateOne) AddStatus(v int8) *MonitorEventUpdateOne {
 	_u.mutation.AddStatus(v)
-	return _u
-}
-
-// SetStartBlock sets the "start_block" field.
-func (_u *MonitorEventUpdateOne) SetStartBlock(v int64) *MonitorEventUpdateOne {
-	_u.mutation.ResetStartBlock()
-	_u.mutation.SetStartBlock(v)
-	return _u
-}
-
-// SetNillableStartBlock sets the "start_block" field if the given value is not nil.
-func (_u *MonitorEventUpdateOne) SetNillableStartBlock(v *int64) *MonitorEventUpdateOne {
-	if v != nil {
-		_u.SetStartBlock(*v)
-	}
-	return _u
-}
-
-// AddStartBlock adds value to the "start_block" field.
-func (_u *MonitorEventUpdateOne) AddStartBlock(v int64) *MonitorEventUpdateOne {
-	_u.mutation.AddStartBlock(v)
 	return _u
 }
 
@@ -441,11 +357,6 @@ func (_u *MonitorEventUpdateOne) check() error {
 			return &ValidationError{Name: "event_name", err: fmt.Errorf(`ent: validator failed for field "MonitorEvent.event_name": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.EventTopic(); ok {
-		if err := monitorevent.EventTopicValidator(v); err != nil {
-			return &ValidationError{Name: "event_topic", err: fmt.Errorf(`ent: validator failed for field "MonitorEvent.event_topic": %w`, err)}
-		}
-	}
 	if v, ok := _u.mutation.MqRoutingKey(); ok {
 		if err := monitorevent.MqRoutingKeyValidator(v); err != nil {
 			return &ValidationError{Name: "mq_routing_key", err: fmt.Errorf(`ent: validator failed for field "MonitorEvent.mq_routing_key": %w`, err)}
@@ -495,9 +406,6 @@ func (_u *MonitorEventUpdateOne) sqlSave(ctx context.Context) (_node *MonitorEve
 	if value, ok := _u.mutation.EventName(); ok {
 		_spec.SetField(monitorevent.FieldEventName, field.TypeString, value)
 	}
-	if value, ok := _u.mutation.EventTopic(); ok {
-		_spec.SetField(monitorevent.FieldEventTopic, field.TypeString, value)
-	}
 	if value, ok := _u.mutation.MqRoutingKey(); ok {
 		_spec.SetField(monitorevent.FieldMqRoutingKey, field.TypeString, value)
 	}
@@ -506,12 +414,6 @@ func (_u *MonitorEventUpdateOne) sqlSave(ctx context.Context) (_node *MonitorEve
 	}
 	if value, ok := _u.mutation.AddedStatus(); ok {
 		_spec.AddField(monitorevent.FieldStatus, field.TypeInt8, value)
-	}
-	if value, ok := _u.mutation.StartBlock(); ok {
-		_spec.SetField(monitorevent.FieldStartBlock, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedStartBlock(); ok {
-		_spec.AddField(monitorevent.FieldStartBlock, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.LastBlock(); ok {
 		_spec.SetField(monitorevent.FieldLastBlock, field.TypeInt64, value)

@@ -8,17 +8,21 @@ import (
 
 	"nexus-chain/ent"
 	"nexus-chain/internal/monitoring/shared"
+	"nexus-chain/pkg/config"
+	"nexus-chain/pkg/rabbitmq"
 
 	"go.uber.org/fx"
 )
 
 const (
 	reconnectInterval = 5 * time.Second
-	refreshInterval   = 10 * time.Second
+	refreshInterval   = time.Minute
 )
 
 type EventListener struct {
 	db            *ent.Client
+	cfg           *config.Config
+	publisher     rabbitmq.Publisher
 	cancel        context.CancelFunc
 	wg            sync.WaitGroup
 	mu            sync.Mutex
@@ -30,12 +34,16 @@ type managedSubscription struct {
 	signature string
 }
 
-func New(lc fx.Lifecycle, db *ent.Client) *EventListener {
-	listener := &EventListener{
+func New(db *ent.Client, cfg *config.Config, publisher rabbitmq.Publisher) *EventListener {
+	return &EventListener{
 		db:            db,
+		cfg:           cfg,
+		publisher:     publisher,
 		subscriptions: make(map[string]*managedSubscription),
 	}
+}
 
+func StartServer(lc fx.Lifecycle, listener *EventListener) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			return listener.start(ctx)
@@ -45,8 +53,6 @@ func New(lc fx.Lifecycle, db *ent.Client) *EventListener {
 			return nil
 		},
 	})
-
-	return listener
 }
 
 func (l *EventListener) start(ctx context.Context) error {
@@ -75,6 +81,7 @@ func (l *EventListener) stop() {
 	l.wg.Wait()
 }
 
+// 每一段时间更新订阅列表，启动新的订阅，停止已删除或禁用的订阅
 func (l *EventListener) refreshLoop(ctx context.Context) {
 	ticker := time.NewTicker(refreshInterval)
 	defer ticker.Stop()
@@ -94,7 +101,7 @@ func (l *EventListener) refreshLoop(ctx context.Context) {
 }
 
 func (l *EventListener) refreshSubscriptions(ctx context.Context, runCtx context.Context) error {
-	desiredSubscriptions, err := shared.LoadRealtimeSubscriptions(ctx, l.db)
+	desiredSubscriptions, err := shared.LoadRealtimeSubscriptions(ctx, l.db, l.cfg)
 	if err != nil {
 		return err
 	}
@@ -107,6 +114,7 @@ func (l *EventListener) refreshSubscriptions(ctx context.Context, runCtx context
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
+	// 启动新的或更新的订阅
 	for key, desired := range desiredByKey {
 		signature := desired.RealtimeSignature()
 		current, exists := l.subscriptions[key]
@@ -134,6 +142,7 @@ func (l *EventListener) refreshSubscriptions(ctx context.Context, runCtx context
 		log.Printf("started subscription for contract=%s event=%s", desired.Contract.Address, desired.Event.EventName)
 	}
 
+	// 清理已删除或禁用的订阅
 	for key, current := range l.subscriptions {
 		if _, exists := desiredByKey[key]; exists {
 			continue

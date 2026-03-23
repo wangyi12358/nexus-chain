@@ -3,7 +3,6 @@ package ethereum
 import (
 	"bytes"
 	"fmt"
-	"strings"
 
 	goethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -19,14 +18,10 @@ func ParseABI(raw []byte) (abi.ABI, error) {
 	return parsedABI, nil
 }
 
-func LookupEvent(parsedABI abi.ABI, eventName, eventTopic string) (abi.Event, error) {
+func LookupEvent(parsedABI abi.ABI, eventName string) (abi.Event, error) {
 	abiEvent, ok := parsedABI.Events[eventName]
 	if !ok {
 		return abi.Event{}, fmt.Errorf("event %s not found in abi", eventName)
-	}
-
-	if !strings.EqualFold(abiEvent.ID.Hex(), eventTopic) {
-		return abi.Event{}, fmt.Errorf("event topic mismatch: abi=%s db=%s", abiEvent.ID.Hex(), eventTopic)
 	}
 
 	return abiEvent, nil

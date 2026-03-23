@@ -33,13 +33,13 @@ func (l *EventListener) runSubscriptionLoop(ctx context.Context, sub *shared.Eve
 }
 
 func (l *EventListener) subscribeOnce(ctx context.Context, sub *shared.EventSubscription) error {
-	client, err := ethclient.DialContext(ctx, sub.Contract.WsURL)
+	client, err := ethclient.DialContext(ctx, sub.WSURL)
 	if err != nil {
 		return fmt.Errorf("dial websocket rpc: %w", err)
 	}
 	defer client.Close()
 
-	query := ethutil.NewLogFilterQuery(sub.Contract.Address, sub.Event.EventTopic)
+	query := ethutil.NewLogFilterQuery(sub.Contract.Address, sub.ABIEvent.ID.Hex())
 	logsCh := make(chan types.Log, 128)
 	subscription, err := client.SubscribeFilterLogs(ctx, query, logsCh)
 	if err != nil {
@@ -57,7 +57,7 @@ func (l *EventListener) subscribeOnce(ctx context.Context, sub *shared.EventSubs
 			}
 			return err
 		case vLog := <-logsCh:
-			if err := shared.ProcessRealtimeLog(ctx, l.db, sub, vLog); err != nil {
+			if err := shared.ProcessRealtimeLog(ctx, l.db, l.publisher, sub, vLog); err != nil {
 				log.Printf(
 					"failed to handle log for contract=%s event=%s tx=%s log_index=%d: %v",
 					sub.Contract.Address,

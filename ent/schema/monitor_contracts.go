@@ -31,12 +31,6 @@ func (MonitorContract) Fields() []ent.Field {
 			Comment("Contract alias for easy identification"),
 		field.JSON("abi", json.RawMessage{}).
 			Comment("Contract ABI definition"),
-		field.String("rpc_url").
-			MaxLen(255).
-			Comment("RPC URL used for historical log queries"),
-		field.String("ws_url").
-			MaxLen(255).
-			Comment("WebSocket RPC URL used for realtime subscriptions"),
 		field.Int8("status").
 			Default(1).
 			Comment("Whether to enable monitoring (0: stop, 1: run)"),

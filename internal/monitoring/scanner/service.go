@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"nexus-chain/ent"
+	"nexus-chain/pkg/config"
+	"nexus-chain/pkg/rabbitmq"
 
 	"go.uber.org/fx"
 )
@@ -18,13 +20,17 @@ const (
 
 type BlockScanner struct {
 	db     *ent.Client
+	cfg    *config.Config
+	pub    rabbitmq.Publisher
 	cancel context.CancelFunc
 	wg     sync.WaitGroup
 }
 
-func New(lc fx.Lifecycle, db *ent.Client) *BlockScanner {
-	scanner := &BlockScanner{db: db}
+func New(db *ent.Client, cfg *config.Config, publisher rabbitmq.Publisher) *BlockScanner {
+	return &BlockScanner{db: db, cfg: cfg, pub: publisher}
+}
 
+func StartServer(lc fx.Lifecycle, scanner *BlockScanner) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			return scanner.start(ctx)
@@ -34,8 +40,6 @@ func New(lc fx.Lifecycle, db *ent.Client) *BlockScanner {
 			return nil
 		},
 	})
-
-	return scanner
 }
 
 func (s *BlockScanner) start(ctx context.Context) error {

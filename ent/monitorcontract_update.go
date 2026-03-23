@@ -91,34 +91,6 @@ func (_u *MonitorContractUpdate) AppendAbi(v json.RawMessage) *MonitorContractUp
 	return _u
 }
 
-// SetRPCURL sets the "rpc_url" field.
-func (_u *MonitorContractUpdate) SetRPCURL(v string) *MonitorContractUpdate {
-	_u.mutation.SetRPCURL(v)
-	return _u
-}
-
-// SetNillableRPCURL sets the "rpc_url" field if the given value is not nil.
-func (_u *MonitorContractUpdate) SetNillableRPCURL(v *string) *MonitorContractUpdate {
-	if v != nil {
-		_u.SetRPCURL(*v)
-	}
-	return _u
-}
-
-// SetWsURL sets the "ws_url" field.
-func (_u *MonitorContractUpdate) SetWsURL(v string) *MonitorContractUpdate {
-	_u.mutation.SetWsURL(v)
-	return _u
-}
-
-// SetNillableWsURL sets the "ws_url" field if the given value is not nil.
-func (_u *MonitorContractUpdate) SetNillableWsURL(v *string) *MonitorContractUpdate {
-	if v != nil {
-		_u.SetWsURL(*v)
-	}
-	return _u
-}
-
 // SetStatus sets the "status" field.
 func (_u *MonitorContractUpdate) SetStatus(v int8) *MonitorContractUpdate {
 	_u.mutation.ResetStatus()
@@ -184,16 +156,6 @@ func (_u *MonitorContractUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MonitorContract.name": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.RPCURL(); ok {
-		if err := monitorcontract.RPCURLValidator(v); err != nil {
-			return &ValidationError{Name: "rpc_url", err: fmt.Errorf(`ent: validator failed for field "MonitorContract.rpc_url": %w`, err)}
-		}
-	}
-	if v, ok := _u.mutation.WsURL(); ok {
-		if err := monitorcontract.WsURLValidator(v); err != nil {
-			return &ValidationError{Name: "ws_url", err: fmt.Errorf(`ent: validator failed for field "MonitorContract.ws_url": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -234,12 +196,6 @@ func (_u *MonitorContractUpdate) sqlSave(ctx context.Context) (_node int, err er
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, monitorcontract.FieldAbi, value)
 		})
-	}
-	if value, ok := _u.mutation.RPCURL(); ok {
-		_spec.SetField(monitorcontract.FieldRPCURL, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.WsURL(); ok {
-		_spec.SetField(monitorcontract.FieldWsURL, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(monitorcontract.FieldStatus, field.TypeInt8, value)
@@ -330,34 +286,6 @@ func (_u *MonitorContractUpdateOne) AppendAbi(v json.RawMessage) *MonitorContrac
 	return _u
 }
 
-// SetRPCURL sets the "rpc_url" field.
-func (_u *MonitorContractUpdateOne) SetRPCURL(v string) *MonitorContractUpdateOne {
-	_u.mutation.SetRPCURL(v)
-	return _u
-}
-
-// SetNillableRPCURL sets the "rpc_url" field if the given value is not nil.
-func (_u *MonitorContractUpdateOne) SetNillableRPCURL(v *string) *MonitorContractUpdateOne {
-	if v != nil {
-		_u.SetRPCURL(*v)
-	}
-	return _u
-}
-
-// SetWsURL sets the "ws_url" field.
-func (_u *MonitorContractUpdateOne) SetWsURL(v string) *MonitorContractUpdateOne {
-	_u.mutation.SetWsURL(v)
-	return _u
-}
-
-// SetNillableWsURL sets the "ws_url" field if the given value is not nil.
-func (_u *MonitorContractUpdateOne) SetNillableWsURL(v *string) *MonitorContractUpdateOne {
-	if v != nil {
-		_u.SetWsURL(*v)
-	}
-	return _u
-}
-
 // SetStatus sets the "status" field.
 func (_u *MonitorContractUpdateOne) SetStatus(v int8) *MonitorContractUpdateOne {
 	_u.mutation.ResetStatus()
@@ -436,16 +364,6 @@ func (_u *MonitorContractUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MonitorContract.name": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.RPCURL(); ok {
-		if err := monitorcontract.RPCURLValidator(v); err != nil {
-			return &ValidationError{Name: "rpc_url", err: fmt.Errorf(`ent: validator failed for field "MonitorContract.rpc_url": %w`, err)}
-		}
-	}
-	if v, ok := _u.mutation.WsURL(); ok {
-		if err := monitorcontract.WsURLValidator(v); err != nil {
-			return &ValidationError{Name: "ws_url", err: fmt.Errorf(`ent: validator failed for field "MonitorContract.ws_url": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -503,12 +421,6 @@ func (_u *MonitorContractUpdateOne) sqlSave(ctx context.Context) (_node *Monitor
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, monitorcontract.FieldAbi, value)
 		})
-	}
-	if value, ok := _u.mutation.RPCURL(); ok {
-		_spec.SetField(monitorcontract.FieldRPCURL, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.WsURL(); ok {
-		_spec.SetField(monitorcontract.FieldWsURL, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(monitorcontract.FieldStatus, field.TypeInt8, value)

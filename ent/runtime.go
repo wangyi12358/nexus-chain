@@ -26,16 +26,8 @@ func init() {
 	monitorcontractDescName := monitorcontractFields[3].Descriptor()
 	// monitorcontract.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	monitorcontract.NameValidator = monitorcontractDescName.Validators[0].(func(string) error)
-	// monitorcontractDescRPCURL is the schema descriptor for rpc_url field.
-	monitorcontractDescRPCURL := monitorcontractFields[5].Descriptor()
-	// monitorcontract.RPCURLValidator is a validator for the "rpc_url" field. It is called by the builders before save.
-	monitorcontract.RPCURLValidator = monitorcontractDescRPCURL.Validators[0].(func(string) error)
-	// monitorcontractDescWsURL is the schema descriptor for ws_url field.
-	monitorcontractDescWsURL := monitorcontractFields[6].Descriptor()
-	// monitorcontract.WsURLValidator is a validator for the "ws_url" field. It is called by the builders before save.
-	monitorcontract.WsURLValidator = monitorcontractDescWsURL.Validators[0].(func(string) error)
 	// monitorcontractDescStatus is the schema descriptor for status field.
-	monitorcontractDescStatus := monitorcontractFields[7].Descriptor()
+	monitorcontractDescStatus := monitorcontractFields[5].Descriptor()
 	// monitorcontract.DefaultStatus holds the default value on creation for the status field.
 	monitorcontract.DefaultStatus = monitorcontractDescStatus.Default.(int8)
 	// monitorcontractDescID is the schema descriptor for id field.
@@ -48,24 +40,16 @@ func init() {
 	monitoreventDescEventName := monitoreventFields[2].Descriptor()
 	// monitorevent.EventNameValidator is a validator for the "event_name" field. It is called by the builders before save.
 	monitorevent.EventNameValidator = monitoreventDescEventName.Validators[0].(func(string) error)
-	// monitoreventDescEventTopic is the schema descriptor for event_topic field.
-	monitoreventDescEventTopic := monitoreventFields[3].Descriptor()
-	// monitorevent.EventTopicValidator is a validator for the "event_topic" field. It is called by the builders before save.
-	monitorevent.EventTopicValidator = monitoreventDescEventTopic.Validators[0].(func(string) error)
 	// monitoreventDescMqRoutingKey is the schema descriptor for mq_routing_key field.
-	monitoreventDescMqRoutingKey := monitoreventFields[4].Descriptor()
+	monitoreventDescMqRoutingKey := monitoreventFields[3].Descriptor()
 	// monitorevent.MqRoutingKeyValidator is a validator for the "mq_routing_key" field. It is called by the builders before save.
 	monitorevent.MqRoutingKeyValidator = monitoreventDescMqRoutingKey.Validators[0].(func(string) error)
 	// monitoreventDescStatus is the schema descriptor for status field.
-	monitoreventDescStatus := monitoreventFields[5].Descriptor()
+	monitoreventDescStatus := monitoreventFields[4].Descriptor()
 	// monitorevent.DefaultStatus holds the default value on creation for the status field.
 	monitorevent.DefaultStatus = monitoreventDescStatus.Default.(int8)
-	// monitoreventDescStartBlock is the schema descriptor for start_block field.
-	monitoreventDescStartBlock := monitoreventFields[6].Descriptor()
-	// monitorevent.DefaultStartBlock holds the default value on creation for the start_block field.
-	monitorevent.DefaultStartBlock = monitoreventDescStartBlock.Default.(int64)
 	// monitoreventDescLastBlock is the schema descriptor for last_block field.
-	monitoreventDescLastBlock := monitoreventFields[7].Descriptor()
+	monitoreventDescLastBlock := monitoreventFields[5].Descriptor()
 	// monitorevent.DefaultLastBlock holds the default value on creation for the last_block field.
 	monitorevent.DefaultLastBlock = monitoreventDescLastBlock.Default.(int64)
 	// monitoreventDescID is the schema descriptor for id field.

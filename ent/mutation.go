@@ -45,8 +45,6 @@ type MonitorContractMutation struct {
 	name          *string
 	abi           *json.RawMessage
 	appendabi     json.RawMessage
-	rpc_url       *string
-	ws_url        *string
 	status        *int8
 	addstatus     *int8
 	clearedFields map[string]struct{}
@@ -338,78 +336,6 @@ func (m *MonitorContractMutation) ResetAbi() {
 	m.appendabi = nil
 }
 
-// SetRPCURL sets the "rpc_url" field.
-func (m *MonitorContractMutation) SetRPCURL(s string) {
-	m.rpc_url = &s
-}
-
-// RPCURL returns the value of the "rpc_url" field in the mutation.
-func (m *MonitorContractMutation) RPCURL() (r string, exists bool) {
-	v := m.rpc_url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRPCURL returns the old "rpc_url" field's value of the MonitorContract entity.
-// If the MonitorContract object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MonitorContractMutation) OldRPCURL(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRPCURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRPCURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRPCURL: %w", err)
-	}
-	return oldValue.RPCURL, nil
-}
-
-// ResetRPCURL resets all changes to the "rpc_url" field.
-func (m *MonitorContractMutation) ResetRPCURL() {
-	m.rpc_url = nil
-}
-
-// SetWsURL sets the "ws_url" field.
-func (m *MonitorContractMutation) SetWsURL(s string) {
-	m.ws_url = &s
-}
-
-// WsURL returns the value of the "ws_url" field in the mutation.
-func (m *MonitorContractMutation) WsURL() (r string, exists bool) {
-	v := m.ws_url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldWsURL returns the old "ws_url" field's value of the MonitorContract entity.
-// If the MonitorContract object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MonitorContractMutation) OldWsURL(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldWsURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldWsURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldWsURL: %w", err)
-	}
-	return oldValue.WsURL, nil
-}
-
-// ResetWsURL resets all changes to the "ws_url" field.
-func (m *MonitorContractMutation) ResetWsURL() {
-	m.ws_url = nil
-}
-
 // SetStatus sets the "status" field.
 func (m *MonitorContractMutation) SetStatus(i int8) {
 	m.status = &i
@@ -500,7 +426,7 @@ func (m *MonitorContractMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MonitorContractMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 5)
 	if m.chain_id != nil {
 		fields = append(fields, monitorcontract.FieldChainID)
 	}
@@ -512,12 +438,6 @@ func (m *MonitorContractMutation) Fields() []string {
 	}
 	if m.abi != nil {
 		fields = append(fields, monitorcontract.FieldAbi)
-	}
-	if m.rpc_url != nil {
-		fields = append(fields, monitorcontract.FieldRPCURL)
-	}
-	if m.ws_url != nil {
-		fields = append(fields, monitorcontract.FieldWsURL)
 	}
 	if m.status != nil {
 		fields = append(fields, monitorcontract.FieldStatus)
@@ -538,10 +458,6 @@ func (m *MonitorContractMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case monitorcontract.FieldAbi:
 		return m.Abi()
-	case monitorcontract.FieldRPCURL:
-		return m.RPCURL()
-	case monitorcontract.FieldWsURL:
-		return m.WsURL()
 	case monitorcontract.FieldStatus:
 		return m.Status()
 	}
@@ -561,10 +477,6 @@ func (m *MonitorContractMutation) OldField(ctx context.Context, name string) (en
 		return m.OldName(ctx)
 	case monitorcontract.FieldAbi:
 		return m.OldAbi(ctx)
-	case monitorcontract.FieldRPCURL:
-		return m.OldRPCURL(ctx)
-	case monitorcontract.FieldWsURL:
-		return m.OldWsURL(ctx)
 	case monitorcontract.FieldStatus:
 		return m.OldStatus(ctx)
 	}
@@ -603,20 +515,6 @@ func (m *MonitorContractMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAbi(v)
-		return nil
-	case monitorcontract.FieldRPCURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRPCURL(v)
-		return nil
-	case monitorcontract.FieldWsURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetWsURL(v)
 		return nil
 	case monitorcontract.FieldStatus:
 		v, ok := value.(int8)
@@ -713,12 +611,6 @@ func (m *MonitorContractMutation) ResetField(name string) error {
 	case monitorcontract.FieldAbi:
 		m.ResetAbi()
 		return nil
-	case monitorcontract.FieldRPCURL:
-		m.ResetRPCURL()
-		return nil
-	case monitorcontract.FieldWsURL:
-		m.ResetWsURL()
-		return nil
 	case monitorcontract.FieldStatus:
 		m.ResetStatus()
 		return nil
@@ -782,12 +674,9 @@ type MonitorEventMutation struct {
 	id             *uuid.UUID
 	contract_id    *uuid.UUID
 	event_name     *string
-	event_topic    *string
 	mq_routing_key *string
 	status         *int8
 	addstatus      *int8
-	start_block    *int64
-	addstart_block *int64
 	last_block     *int64
 	addlast_block  *int64
 	clearedFields  map[string]struct{}
@@ -972,42 +861,6 @@ func (m *MonitorEventMutation) ResetEventName() {
 	m.event_name = nil
 }
 
-// SetEventTopic sets the "event_topic" field.
-func (m *MonitorEventMutation) SetEventTopic(s string) {
-	m.event_topic = &s
-}
-
-// EventTopic returns the value of the "event_topic" field in the mutation.
-func (m *MonitorEventMutation) EventTopic() (r string, exists bool) {
-	v := m.event_topic
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEventTopic returns the old "event_topic" field's value of the MonitorEvent entity.
-// If the MonitorEvent object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MonitorEventMutation) OldEventTopic(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEventTopic is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEventTopic requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEventTopic: %w", err)
-	}
-	return oldValue.EventTopic, nil
-}
-
-// ResetEventTopic resets all changes to the "event_topic" field.
-func (m *MonitorEventMutation) ResetEventTopic() {
-	m.event_topic = nil
-}
-
 // SetMqRoutingKey sets the "mq_routing_key" field.
 func (m *MonitorEventMutation) SetMqRoutingKey(s string) {
 	m.mq_routing_key = &s
@@ -1100,62 +953,6 @@ func (m *MonitorEventMutation) ResetStatus() {
 	m.addstatus = nil
 }
 
-// SetStartBlock sets the "start_block" field.
-func (m *MonitorEventMutation) SetStartBlock(i int64) {
-	m.start_block = &i
-	m.addstart_block = nil
-}
-
-// StartBlock returns the value of the "start_block" field in the mutation.
-func (m *MonitorEventMutation) StartBlock() (r int64, exists bool) {
-	v := m.start_block
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldStartBlock returns the old "start_block" field's value of the MonitorEvent entity.
-// If the MonitorEvent object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MonitorEventMutation) OldStartBlock(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStartBlock is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStartBlock requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStartBlock: %w", err)
-	}
-	return oldValue.StartBlock, nil
-}
-
-// AddStartBlock adds i to the "start_block" field.
-func (m *MonitorEventMutation) AddStartBlock(i int64) {
-	if m.addstart_block != nil {
-		*m.addstart_block += i
-	} else {
-		m.addstart_block = &i
-	}
-}
-
-// AddedStartBlock returns the value that was added to the "start_block" field in this mutation.
-func (m *MonitorEventMutation) AddedStartBlock() (r int64, exists bool) {
-	v := m.addstart_block
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetStartBlock resets all changes to the "start_block" field.
-func (m *MonitorEventMutation) ResetStartBlock() {
-	m.start_block = nil
-	m.addstart_block = nil
-}
-
 // SetLastBlock sets the "last_block" field.
 func (m *MonitorEventMutation) SetLastBlock(i int64) {
 	m.last_block = &i
@@ -1246,24 +1043,18 @@ func (m *MonitorEventMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MonitorEventMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 5)
 	if m.contract_id != nil {
 		fields = append(fields, monitorevent.FieldContractID)
 	}
 	if m.event_name != nil {
 		fields = append(fields, monitorevent.FieldEventName)
 	}
-	if m.event_topic != nil {
-		fields = append(fields, monitorevent.FieldEventTopic)
-	}
 	if m.mq_routing_key != nil {
 		fields = append(fields, monitorevent.FieldMqRoutingKey)
 	}
 	if m.status != nil {
 		fields = append(fields, monitorevent.FieldStatus)
-	}
-	if m.start_block != nil {
-		fields = append(fields, monitorevent.FieldStartBlock)
 	}
 	if m.last_block != nil {
 		fields = append(fields, monitorevent.FieldLastBlock)
@@ -1280,14 +1071,10 @@ func (m *MonitorEventMutation) Field(name string) (ent.Value, bool) {
 		return m.ContractID()
 	case monitorevent.FieldEventName:
 		return m.EventName()
-	case monitorevent.FieldEventTopic:
-		return m.EventTopic()
 	case monitorevent.FieldMqRoutingKey:
 		return m.MqRoutingKey()
 	case monitorevent.FieldStatus:
 		return m.Status()
-	case monitorevent.FieldStartBlock:
-		return m.StartBlock()
 	case monitorevent.FieldLastBlock:
 		return m.LastBlock()
 	}
@@ -1303,14 +1090,10 @@ func (m *MonitorEventMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldContractID(ctx)
 	case monitorevent.FieldEventName:
 		return m.OldEventName(ctx)
-	case monitorevent.FieldEventTopic:
-		return m.OldEventTopic(ctx)
 	case monitorevent.FieldMqRoutingKey:
 		return m.OldMqRoutingKey(ctx)
 	case monitorevent.FieldStatus:
 		return m.OldStatus(ctx)
-	case monitorevent.FieldStartBlock:
-		return m.OldStartBlock(ctx)
 	case monitorevent.FieldLastBlock:
 		return m.OldLastBlock(ctx)
 	}
@@ -1336,13 +1119,6 @@ func (m *MonitorEventMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetEventName(v)
 		return nil
-	case monitorevent.FieldEventTopic:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEventTopic(v)
-		return nil
 	case monitorevent.FieldMqRoutingKey:
 		v, ok := value.(string)
 		if !ok {
@@ -1356,13 +1132,6 @@ func (m *MonitorEventMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
-		return nil
-	case monitorevent.FieldStartBlock:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetStartBlock(v)
 		return nil
 	case monitorevent.FieldLastBlock:
 		v, ok := value.(int64)
@@ -1382,9 +1151,6 @@ func (m *MonitorEventMutation) AddedFields() []string {
 	if m.addstatus != nil {
 		fields = append(fields, monitorevent.FieldStatus)
 	}
-	if m.addstart_block != nil {
-		fields = append(fields, monitorevent.FieldStartBlock)
-	}
 	if m.addlast_block != nil {
 		fields = append(fields, monitorevent.FieldLastBlock)
 	}
@@ -1398,8 +1164,6 @@ func (m *MonitorEventMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case monitorevent.FieldStatus:
 		return m.AddedStatus()
-	case monitorevent.FieldStartBlock:
-		return m.AddedStartBlock()
 	case monitorevent.FieldLastBlock:
 		return m.AddedLastBlock()
 	}
@@ -1417,13 +1181,6 @@ func (m *MonitorEventMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddStatus(v)
-		return nil
-	case monitorevent.FieldStartBlock:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddStartBlock(v)
 		return nil
 	case monitorevent.FieldLastBlock:
 		v, ok := value.(int64)
@@ -1465,17 +1222,11 @@ func (m *MonitorEventMutation) ResetField(name string) error {
 	case monitorevent.FieldEventName:
 		m.ResetEventName()
 		return nil
-	case monitorevent.FieldEventTopic:
-		m.ResetEventTopic()
-		return nil
 	case monitorevent.FieldMqRoutingKey:
 		m.ResetMqRoutingKey()
 		return nil
 	case monitorevent.FieldStatus:
 		m.ResetStatus()
-		return nil
-	case monitorevent.FieldStartBlock:
-		m.ResetStartBlock()
 		return nil
 	case monitorevent.FieldLastBlock:
 		m.ResetLastBlock()

@@ -52,16 +52,6 @@ func (_q *MonitorContractQuery) collectField(ctx context.Context, oneNode bool, 
 				selectedFields = append(selectedFields, monitorcontract.FieldAbi)
 				fieldSeen[monitorcontract.FieldAbi] = struct{}{}
 			}
-		case "rpcURL":
-			if _, ok := fieldSeen[monitorcontract.FieldRPCURL]; !ok {
-				selectedFields = append(selectedFields, monitorcontract.FieldRPCURL)
-				fieldSeen[monitorcontract.FieldRPCURL] = struct{}{}
-			}
-		case "wsURL":
-			if _, ok := fieldSeen[monitorcontract.FieldWsURL]; !ok {
-				selectedFields = append(selectedFields, monitorcontract.FieldWsURL)
-				fieldSeen[monitorcontract.FieldWsURL] = struct{}{}
-			}
 		case "status":
 			if _, ok := fieldSeen[monitorcontract.FieldStatus]; !ok {
 				selectedFields = append(selectedFields, monitorcontract.FieldStatus)
@@ -139,11 +129,6 @@ func (_q *MonitorEventQuery) collectField(ctx context.Context, oneNode bool, opC
 				selectedFields = append(selectedFields, monitorevent.FieldEventName)
 				fieldSeen[monitorevent.FieldEventName] = struct{}{}
 			}
-		case "eventTopic":
-			if _, ok := fieldSeen[monitorevent.FieldEventTopic]; !ok {
-				selectedFields = append(selectedFields, monitorevent.FieldEventTopic)
-				fieldSeen[monitorevent.FieldEventTopic] = struct{}{}
-			}
 		case "mqRoutingKey":
 			if _, ok := fieldSeen[monitorevent.FieldMqRoutingKey]; !ok {
 				selectedFields = append(selectedFields, monitorevent.FieldMqRoutingKey)
@@ -153,11 +138,6 @@ func (_q *MonitorEventQuery) collectField(ctx context.Context, oneNode bool, opC
 			if _, ok := fieldSeen[monitorevent.FieldStatus]; !ok {
 				selectedFields = append(selectedFields, monitorevent.FieldStatus)
 				fieldSeen[monitorevent.FieldStatus] = struct{}{}
-			}
-		case "startBlock":
-			if _, ok := fieldSeen[monitorevent.FieldStartBlock]; !ok {
-				selectedFields = append(selectedFields, monitorevent.FieldStartBlock)
-				fieldSeen[monitorevent.FieldStartBlock] = struct{}{}
 			}
 		case "lastBlock":
 			if _, ok := fieldSeen[monitorevent.FieldLastBlock]; !ok {

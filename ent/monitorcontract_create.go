@@ -48,18 +48,6 @@ func (_c *MonitorContractCreate) SetAbi(v json.RawMessage) *MonitorContractCreat
 	return _c
 }
 
-// SetRPCURL sets the "rpc_url" field.
-func (_c *MonitorContractCreate) SetRPCURL(v string) *MonitorContractCreate {
-	_c.mutation.SetRPCURL(v)
-	return _c
-}
-
-// SetWsURL sets the "ws_url" field.
-func (_c *MonitorContractCreate) SetWsURL(v string) *MonitorContractCreate {
-	_c.mutation.SetWsURL(v)
-	return _c
-}
-
 // SetStatus sets the "status" field.
 func (_c *MonitorContractCreate) SetStatus(v int8) *MonitorContractCreate {
 	_c.mutation.SetStatus(v)
@@ -157,22 +145,6 @@ func (_c *MonitorContractCreate) check() error {
 	if _, ok := _c.mutation.Abi(); !ok {
 		return &ValidationError{Name: "abi", err: errors.New(`ent: missing required field "MonitorContract.abi"`)}
 	}
-	if _, ok := _c.mutation.RPCURL(); !ok {
-		return &ValidationError{Name: "rpc_url", err: errors.New(`ent: missing required field "MonitorContract.rpc_url"`)}
-	}
-	if v, ok := _c.mutation.RPCURL(); ok {
-		if err := monitorcontract.RPCURLValidator(v); err != nil {
-			return &ValidationError{Name: "rpc_url", err: fmt.Errorf(`ent: validator failed for field "MonitorContract.rpc_url": %w`, err)}
-		}
-	}
-	if _, ok := _c.mutation.WsURL(); !ok {
-		return &ValidationError{Name: "ws_url", err: errors.New(`ent: missing required field "MonitorContract.ws_url"`)}
-	}
-	if v, ok := _c.mutation.WsURL(); ok {
-		if err := monitorcontract.WsURLValidator(v); err != nil {
-			return &ValidationError{Name: "ws_url", err: fmt.Errorf(`ent: validator failed for field "MonitorContract.ws_url": %w`, err)}
-		}
-	}
 	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "MonitorContract.status"`)}
 	}
@@ -227,14 +199,6 @@ func (_c *MonitorContractCreate) createSpec() (*MonitorContract, *sqlgraph.Creat
 	if value, ok := _c.mutation.Abi(); ok {
 		_spec.SetField(monitorcontract.FieldAbi, field.TypeJSON, value)
 		_node.Abi = value
-	}
-	if value, ok := _c.mutation.RPCURL(); ok {
-		_spec.SetField(monitorcontract.FieldRPCURL, field.TypeString, value)
-		_node.RPCURL = value
-	}
-	if value, ok := _c.mutation.WsURL(); ok {
-		_spec.SetField(monitorcontract.FieldWsURL, field.TypeString, value)
-		_node.WsURL = value
 	}
 	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(monitorcontract.FieldStatus, field.TypeInt8, value)
@@ -343,30 +307,6 @@ func (u *MonitorContractUpsert) SetAbi(v json.RawMessage) *MonitorContractUpsert
 // UpdateAbi sets the "abi" field to the value that was provided on create.
 func (u *MonitorContractUpsert) UpdateAbi() *MonitorContractUpsert {
 	u.SetExcluded(monitorcontract.FieldAbi)
-	return u
-}
-
-// SetRPCURL sets the "rpc_url" field.
-func (u *MonitorContractUpsert) SetRPCURL(v string) *MonitorContractUpsert {
-	u.Set(monitorcontract.FieldRPCURL, v)
-	return u
-}
-
-// UpdateRPCURL sets the "rpc_url" field to the value that was provided on create.
-func (u *MonitorContractUpsert) UpdateRPCURL() *MonitorContractUpsert {
-	u.SetExcluded(monitorcontract.FieldRPCURL)
-	return u
-}
-
-// SetWsURL sets the "ws_url" field.
-func (u *MonitorContractUpsert) SetWsURL(v string) *MonitorContractUpsert {
-	u.Set(monitorcontract.FieldWsURL, v)
-	return u
-}
-
-// UpdateWsURL sets the "ws_url" field to the value that was provided on create.
-func (u *MonitorContractUpsert) UpdateWsURL() *MonitorContractUpsert {
-	u.SetExcluded(monitorcontract.FieldWsURL)
 	return u
 }
 
@@ -496,34 +436,6 @@ func (u *MonitorContractUpsertOne) SetAbi(v json.RawMessage) *MonitorContractUps
 func (u *MonitorContractUpsertOne) UpdateAbi() *MonitorContractUpsertOne {
 	return u.Update(func(s *MonitorContractUpsert) {
 		s.UpdateAbi()
-	})
-}
-
-// SetRPCURL sets the "rpc_url" field.
-func (u *MonitorContractUpsertOne) SetRPCURL(v string) *MonitorContractUpsertOne {
-	return u.Update(func(s *MonitorContractUpsert) {
-		s.SetRPCURL(v)
-	})
-}
-
-// UpdateRPCURL sets the "rpc_url" field to the value that was provided on create.
-func (u *MonitorContractUpsertOne) UpdateRPCURL() *MonitorContractUpsertOne {
-	return u.Update(func(s *MonitorContractUpsert) {
-		s.UpdateRPCURL()
-	})
-}
-
-// SetWsURL sets the "ws_url" field.
-func (u *MonitorContractUpsertOne) SetWsURL(v string) *MonitorContractUpsertOne {
-	return u.Update(func(s *MonitorContractUpsert) {
-		s.SetWsURL(v)
-	})
-}
-
-// UpdateWsURL sets the "ws_url" field to the value that was provided on create.
-func (u *MonitorContractUpsertOne) UpdateWsURL() *MonitorContractUpsertOne {
-	return u.Update(func(s *MonitorContractUpsert) {
-		s.UpdateWsURL()
 	})
 }
 
@@ -823,34 +735,6 @@ func (u *MonitorContractUpsertBulk) SetAbi(v json.RawMessage) *MonitorContractUp
 func (u *MonitorContractUpsertBulk) UpdateAbi() *MonitorContractUpsertBulk {
 	return u.Update(func(s *MonitorContractUpsert) {
 		s.UpdateAbi()
-	})
-}
-
-// SetRPCURL sets the "rpc_url" field.
-func (u *MonitorContractUpsertBulk) SetRPCURL(v string) *MonitorContractUpsertBulk {
-	return u.Update(func(s *MonitorContractUpsert) {
-		s.SetRPCURL(v)
-	})
-}
-
-// UpdateRPCURL sets the "rpc_url" field to the value that was provided on create.
-func (u *MonitorContractUpsertBulk) UpdateRPCURL() *MonitorContractUpsertBulk {
-	return u.Update(func(s *MonitorContractUpsert) {
-		s.UpdateRPCURL()
-	})
-}
-
-// SetWsURL sets the "ws_url" field.
-func (u *MonitorContractUpsertBulk) SetWsURL(v string) *MonitorContractUpsertBulk {
-	return u.Update(func(s *MonitorContractUpsert) {
-		s.SetWsURL(v)
-	})
-}
-
-// UpdateWsURL sets the "ws_url" field to the value that was provided on create.
-func (u *MonitorContractUpsertBulk) UpdateWsURL() *MonitorContractUpsertBulk {
-	return u.Update(func(s *MonitorContractUpsert) {
-		s.UpdateWsURL()
 	})
 }
 

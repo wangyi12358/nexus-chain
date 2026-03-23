@@ -11,7 +11,7 @@ import (
 )
 
 func (s *BlockScanner) scanTarget(ctx context.Context, target *shared.EventSubscription) error {
-	client, err := ethclient.DialContext(ctx, target.Contract.RPCURL)
+	client, err := ethclient.DialContext(ctx, target.RPCURL)
 	if err != nil {
 		return fmt.Errorf("dial rpc: %w", err)
 	}
@@ -22,7 +22,7 @@ func (s *BlockScanner) scanTarget(ctx context.Context, target *shared.EventSubsc
 		return fmt.Errorf("get latest block: %w", err)
 	}
 
-	fromBlock := nextScanStart(target.Event.StartBlock, target.Event.LastBlock)
+	fromBlock := nextScanStart(target.Event.LastBlock, latestBlock)
 	toBlock := int64(latestBlock)
 	if fromBlock > toBlock {
 		return nil
@@ -34,14 +34,14 @@ func (s *BlockScanner) scanTarget(ctx context.Context, target *shared.EventSubsc
 			end = toBlock
 		}
 
-		query := ethutil.NewLogFilterQueryRange(target.Contract.Address, target.Event.EventTopic, start, end)
+		query := ethutil.NewLogFilterQueryRange(target.Contract.Address, target.ABIEvent.ID.Hex(), start, end)
 		logs, err := client.FilterLogs(ctx, query)
 		if err != nil {
 			return fmt.Errorf("filter logs [%d,%d]: %w", start, end, err)
 		}
 
 		for _, vLog := range logs {
-			if err := shared.ProcessHistoricalLog(ctx, s.db, target, vLog); err != nil {
+			if err := shared.ProcessHistoricalLog(ctx, s.db, s.pub, target, vLog); err != nil {
 				return fmt.Errorf("handle historical log tx=%s index=%d: %w", vLog.TxHash.Hex(), vLog.Index, err)
 			}
 		}
@@ -57,9 +57,9 @@ func (s *BlockScanner) scanTarget(ctx context.Context, target *shared.EventSubsc
 	return nil
 }
 
-func nextScanStart(startBlock, lastBlock int64) int64 {
+func nextScanStart(lastBlock int64, latestBlock uint64) int64 {
 	if lastBlock > 0 {
 		return lastBlock + 1
 	}
-	return startBlock
+	return int64(latestBlock)
 }
