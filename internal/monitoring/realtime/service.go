@@ -1,4 +1,4 @@
-package monitoring
+package realtime
 
 import (
 	"context"
@@ -7,17 +7,17 @@ import (
 	"time"
 
 	"nexus-chain/ent"
+	"nexus-chain/internal/monitoring/shared"
 
 	"go.uber.org/fx"
 )
 
 const (
-	activeStatus      = int8(1)
 	reconnectInterval = 5 * time.Second
 	refreshInterval   = 10 * time.Second
 )
 
-type RealtimeEventListener struct {
+type EventListener struct {
 	db            *ent.Client
 	cancel        context.CancelFunc
 	wg            sync.WaitGroup
@@ -30,8 +30,8 @@ type managedSubscription struct {
 	signature string
 }
 
-func NewRealtimeEventListener(lc fx.Lifecycle, db *ent.Client) *RealtimeEventListener {
-	listener := &RealtimeEventListener{
+func New(lc fx.Lifecycle, db *ent.Client) *EventListener {
+	listener := &EventListener{
 		db:            db,
 		subscriptions: make(map[string]*managedSubscription),
 	}
@@ -49,7 +49,7 @@ func NewRealtimeEventListener(lc fx.Lifecycle, db *ent.Client) *RealtimeEventLis
 	return listener
 }
 
-func (l *RealtimeEventListener) start(ctx context.Context) error {
+func (l *EventListener) start(ctx context.Context) error {
 	runCtx, cancel := context.WithCancel(context.Background())
 	l.cancel = cancel
 
@@ -68,14 +68,14 @@ func (l *RealtimeEventListener) start(ctx context.Context) error {
 	return nil
 }
 
-func (l *RealtimeEventListener) stop() {
+func (l *EventListener) stop() {
 	if l.cancel != nil {
 		l.cancel()
 	}
 	l.wg.Wait()
 }
 
-func (l *RealtimeEventListener) refreshLoop(ctx context.Context) {
+func (l *EventListener) refreshLoop(ctx context.Context) {
 	ticker := time.NewTicker(refreshInterval)
 	defer ticker.Stop()
 
@@ -93,22 +93,22 @@ func (l *RealtimeEventListener) refreshLoop(ctx context.Context) {
 	}
 }
 
-func (l *RealtimeEventListener) refreshSubscriptions(ctx context.Context, runCtx context.Context) error {
-	desiredSubscriptions, err := l.loadSubscriptions(ctx)
+func (l *EventListener) refreshSubscriptions(ctx context.Context, runCtx context.Context) error {
+	desiredSubscriptions, err := shared.LoadRealtimeSubscriptions(ctx, l.db)
 	if err != nil {
 		return err
 	}
 
-	desiredByKey := make(map[string]*eventSubscription, len(desiredSubscriptions))
+	desiredByKey := make(map[string]*shared.EventSubscription, len(desiredSubscriptions))
 	for _, subscription := range desiredSubscriptions {
-		desiredByKey[subscription.key()] = subscription
+		desiredByKey[subscription.Key()] = subscription
 	}
 
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
 	for key, desired := range desiredByKey {
-		signature := desired.signature()
+		signature := desired.RealtimeSignature()
 		current, exists := l.subscriptions[key]
 		if exists && current.signature == signature {
 			continue
@@ -126,12 +126,12 @@ func (l *RealtimeEventListener) refreshSubscriptions(ctx context.Context, runCtx
 		}
 
 		l.wg.Add(1)
-		go func(subscriptionCtx context.Context, sub *eventSubscription) {
+		go func(subscriptionCtx context.Context, sub *shared.EventSubscription) {
 			defer l.wg.Done()
 			l.runSubscriptionLoop(subscriptionCtx, sub)
 		}(subCtx, desired)
 
-		log.Printf("started subscription for contract=%s event=%s", desired.contract.Address, desired.event.EventName)
+		log.Printf("started subscription for contract=%s event=%s", desired.Contract.Address, desired.Event.EventName)
 	}
 
 	for key, current := range l.subscriptions {

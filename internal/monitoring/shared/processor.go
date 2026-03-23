@@ -1,4 +1,4 @@
-package monitoring
+package shared
 
 import (
 	"context"
@@ -6,36 +6,49 @@ import (
 	"log"
 	"strings"
 
+	"nexus-chain/ent"
 	"nexus-chain/ent/parsedeventslog"
 	ethutil "nexus-chain/pkg/ethereum"
 
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
-func (l *RealtimeEventListener) handleLog(ctx context.Context, sub *eventSubscription, vLog types.Log) error {
+func ProcessRealtimeLog(ctx context.Context, db *ent.Client, sub *EventSubscription, vLog types.Log) error {
 	if vLog.Removed {
 		log.Printf(
 			"skip removed log for contract=%s event=%s tx=%s log_index=%d",
-			sub.contract.Address,
-			sub.event.EventName,
+			sub.Contract.Address,
+			sub.Event.EventName,
 			vLog.TxHash.Hex(),
 			vLog.Index,
 		)
 		return nil
 	}
 
-	parsedData, err := ethutil.DecodeLog(sub.abiEvent, vLog)
+	return processLog(ctx, db, sub, vLog)
+}
+
+func ProcessHistoricalLog(ctx context.Context, db *ent.Client, sub *EventSubscription, vLog types.Log) error {
+	if vLog.Removed {
+		return nil
+	}
+
+	return processLog(ctx, db, sub, vLog)
+}
+
+func processLog(ctx context.Context, db *ent.Client, sub *EventSubscription, vLog types.Log) error {
+	parsedData, err := ethutil.DecodeLog(sub.ABIEvent, vLog)
 	if err != nil {
 		return fmt.Errorf("decode event log: %w", err)
 	}
 
-	parsedData["contract_address"] = sub.contract.Address
-	parsedData["event_name"] = sub.event.EventName
-	parsedData["event_topic"] = sub.event.EventTopic
+	parsedData["contract_address"] = sub.Contract.Address
+	parsedData["event_name"] = sub.Event.EventName
+	parsedData["event_topic"] = sub.Event.EventTopic
 
-	if err := l.db.ParsedEventsLog.Create().
+	if err := db.ParsedEventsLog.Create().
 		SetUID(buildUID(vLog.TxHash.Hex(), int64(vLog.Index))).
-		SetEventID(sub.event.ID).
+		SetEventID(sub.Event.ID).
 		SetBlockNumber(int64(vLog.BlockNumber)).
 		SetTxHash(vLog.TxHash.Hex()).
 		SetLogIndex(int64(vLog.Index)).
@@ -47,15 +60,6 @@ func (l *RealtimeEventListener) handleLog(ctx context.Context, sub *eventSubscri
 		DoNothing().
 		Exec(ctx); err != nil {
 		return fmt.Errorf("insert parsed event log: %w", err)
-	}
-
-	if int64(vLog.BlockNumber) > sub.lastBlock {
-		if err := l.db.MonitorEvent.UpdateOneID(sub.event.ID).
-			SetLastBlock(int64(vLog.BlockNumber)).
-			Exec(ctx); err != nil {
-			return fmt.Errorf("update monitor event last_block: %w", err)
-		}
-		sub.lastBlock = int64(vLog.BlockNumber)
 	}
 
 	return nil

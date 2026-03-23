@@ -26,7 +26,6 @@ func NewEntClient(cfg *config.Config) (*ent.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open ent client: %w", err)
 	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 

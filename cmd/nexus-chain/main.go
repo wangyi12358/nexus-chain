@@ -1,7 +1,8 @@
 package main
 
 import (
-	"nexus-chain/internal/monitoring"
+	"nexus-chain/internal/monitoring/realtime"
+	"nexus-chain/internal/monitoring/scanner"
 	"nexus-chain/internal/net"
 	"nexus-chain/pkg/config"
 	"nexus-chain/pkg/database"
@@ -14,7 +15,8 @@ func main() {
 		fx.Provide(config.New),
 		fx.Provide(database.NewEntClient),
 		fx.Provide(net.NewHTTPServer),
-		fx.Provide(monitoring.NewRealtimeEventListener),
+		fx.Provide(scanner.New),
+		fx.Provide(realtime.New),
 		fx.Invoke(database.RegisterHooks),
 		fx.Invoke(net.StartHTTPServer),
 	).Run()

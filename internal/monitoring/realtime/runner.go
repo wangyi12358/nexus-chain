@@ -1,4 +1,4 @@
-package monitoring
+package realtime
 
 import (
 	"context"
@@ -6,19 +6,20 @@ import (
 	"log"
 	"time"
 
+	"nexus-chain/internal/monitoring/shared"
 	ethutil "nexus-chain/pkg/ethereum"
 
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func (l *RealtimeEventListener) runSubscriptionLoop(ctx context.Context, sub *eventSubscription) {
+func (l *EventListener) runSubscriptionLoop(ctx context.Context, sub *shared.EventSubscription) {
 	for {
 		if err := l.subscribeOnce(ctx, sub); err != nil && ctx.Err() == nil {
 			log.Printf(
 				"subscription stopped for contract=%s event=%s: %v",
-				sub.contract.Address,
-				sub.event.EventName,
+				sub.Contract.Address,
+				sub.Event.EventName,
 				err,
 			)
 		}
@@ -31,14 +32,14 @@ func (l *RealtimeEventListener) runSubscriptionLoop(ctx context.Context, sub *ev
 	}
 }
 
-func (l *RealtimeEventListener) subscribeOnce(ctx context.Context, sub *eventSubscription) error {
-	client, err := ethclient.DialContext(ctx, sub.contract.WsURL)
+func (l *EventListener) subscribeOnce(ctx context.Context, sub *shared.EventSubscription) error {
+	client, err := ethclient.DialContext(ctx, sub.Contract.WsURL)
 	if err != nil {
 		return fmt.Errorf("dial websocket rpc: %w", err)
 	}
 	defer client.Close()
 
-	query := ethutil.NewLogFilterQuery(sub.contract.Address, sub.event.EventTopic)
+	query := ethutil.NewLogFilterQuery(sub.Contract.Address, sub.Event.EventTopic)
 	logsCh := make(chan types.Log, 128)
 	subscription, err := client.SubscribeFilterLogs(ctx, query, logsCh)
 	if err != nil {
@@ -56,11 +57,11 @@ func (l *RealtimeEventListener) subscribeOnce(ctx context.Context, sub *eventSub
 			}
 			return err
 		case vLog := <-logsCh:
-			if err := l.handleLog(ctx, sub, vLog); err != nil {
+			if err := shared.ProcessRealtimeLog(ctx, l.db, sub, vLog); err != nil {
 				log.Printf(
 					"failed to handle log for contract=%s event=%s tx=%s log_index=%d: %v",
-					sub.contract.Address,
-					sub.event.EventName,
+					sub.Contract.Address,
+					sub.Event.EventName,
 					vLog.TxHash.Hex(),
 					vLog.Index,
 					err,
