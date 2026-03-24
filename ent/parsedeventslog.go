@@ -22,6 +22,8 @@ type ParsedEventsLog struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// Business UID
 	UID string `json:"uid,omitempty"`
+	// Chain ID
+	ChainID int `json:"chain_id,omitempty"`
 	// Foreign key to monitor_events.id
 	EventID uuid.UUID `json:"event_id,omitempty"`
 	// Block number
@@ -44,7 +46,7 @@ func (*ParsedEventsLog) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case parsedeventslog.FieldParsedData:
 			values[i] = new([]byte)
-		case parsedeventslog.FieldBlockNumber, parsedeventslog.FieldLogIndex:
+		case parsedeventslog.FieldChainID, parsedeventslog.FieldBlockNumber, parsedeventslog.FieldLogIndex:
 			values[i] = new(sql.NullInt64)
 		case parsedeventslog.FieldUID, parsedeventslog.FieldTxHash:
 			values[i] = new(sql.NullString)
@@ -78,6 +80,12 @@ func (_m *ParsedEventsLog) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field uid", values[i])
 			} else if value.Valid {
 				_m.UID = value.String
+			}
+		case parsedeventslog.FieldChainID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field chain_id", values[i])
+			} else if value.Valid {
+				_m.ChainID = int(value.Int64)
 			}
 		case parsedeventslog.FieldEventID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -155,6 +163,9 @@ func (_m *ParsedEventsLog) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("uid=")
 	builder.WriteString(_m.UID)
+	builder.WriteString(", ")
+	builder.WriteString("chain_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ChainID))
 	builder.WriteString(", ")
 	builder.WriteString("event_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.EventID))

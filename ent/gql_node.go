@@ -5,8 +5,11 @@ package ent
 import (
 	"context"
 	"fmt"
+	"nexus-chain/ent/chain"
+	"nexus-chain/ent/chainnode"
 	"nexus-chain/ent/monitorcontract"
 	"nexus-chain/ent/monitorevent"
+	"nexus-chain/ent/monitoreventcursor"
 	"nexus-chain/ent/parsedeventslog"
 
 	"entgo.io/contrib/entgql"
@@ -20,6 +23,16 @@ type Noder interface {
 	IsNode()
 }
 
+var chainImplementors = []string{"Chain", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*Chain) IsNode() {}
+
+var chainnodeImplementors = []string{"ChainNode", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*ChainNode) IsNode() {}
+
 var monitorcontractImplementors = []string{"MonitorContract", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
@@ -29,6 +42,11 @@ var monitoreventImplementors = []string{"MonitorEvent", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*MonitorEvent) IsNode() {}
+
+var monitoreventcursorImplementors = []string{"MonitorEventCursor", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*MonitorEventCursor) IsNode() {}
 
 var parsedeventslogImplementors = []string{"ParsedEventsLog", "Node"}
 
@@ -93,6 +111,24 @@ func (c *Client) Noder(ctx context.Context, id uuid.UUID, opts ...NodeOption) (_
 
 func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, error) {
 	switch table {
+	case chain.Table:
+		query := c.Chain.Query().
+			Where(chain.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, chainImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case chainnode.Table:
+		query := c.ChainNode.Query().
+			Where(chainnode.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, chainnodeImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
 	case monitorcontract.Table:
 		query := c.MonitorContract.Query().
 			Where(monitorcontract.ID(id))
@@ -107,6 +143,15 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 			Where(monitorevent.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
 			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, monitoreventImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case monitoreventcursor.Table:
+		query := c.MonitorEventCursor.Query().
+			Where(monitoreventcursor.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, monitoreventcursorImplementors...); err != nil {
 				return nil, err
 			}
 		}
@@ -193,6 +238,38 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
+	case chain.Table:
+		query := c.Chain.Query().
+			Where(chain.IDIn(ids...))
+		query, err := query.CollectFields(ctx, chainImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case chainnode.Table:
+		query := c.ChainNode.Query().
+			Where(chainnode.IDIn(ids...))
+		query, err := query.CollectFields(ctx, chainnodeImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case monitorcontract.Table:
 		query := c.MonitorContract.Query().
 			Where(monitorcontract.IDIn(ids...))
@@ -213,6 +290,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 		query := c.MonitorEvent.Query().
 			Where(monitorevent.IDIn(ids...))
 		query, err := query.CollectFields(ctx, monitoreventImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case monitoreventcursor.Table:
+		query := c.MonitorEventCursor.Query().
+			Where(monitoreventcursor.IDIn(ids...))
+		query, err := query.CollectFields(ctx, monitoreventcursorImplementors...)
 		if err != nil {
 			return nil, err
 		}

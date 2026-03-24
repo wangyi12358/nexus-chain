@@ -7,5 +7,5 @@ import (
 )
 
 func (s *BlockScanner) loadScanTargets(ctx context.Context) ([]*shared.EventSubscription, error) {
-	return shared.LoadScanSubscriptions(ctx, s.db, s.cfg, s.rabbitmqClient)
+	return shared.LoadScanSubscriptions(ctx, s.db, s.rabbitmqClient)
 }

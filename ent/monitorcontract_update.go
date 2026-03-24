@@ -91,6 +91,27 @@ func (_u *MonitorContractUpdate) AppendAbi(v json.RawMessage) *MonitorContractUp
 	return _u
 }
 
+// SetDeployedBlock sets the "deployed_block" field.
+func (_u *MonitorContractUpdate) SetDeployedBlock(v int64) *MonitorContractUpdate {
+	_u.mutation.ResetDeployedBlock()
+	_u.mutation.SetDeployedBlock(v)
+	return _u
+}
+
+// SetNillableDeployedBlock sets the "deployed_block" field if the given value is not nil.
+func (_u *MonitorContractUpdate) SetNillableDeployedBlock(v *int64) *MonitorContractUpdate {
+	if v != nil {
+		_u.SetDeployedBlock(*v)
+	}
+	return _u
+}
+
+// AddDeployedBlock adds value to the "deployed_block" field.
+func (_u *MonitorContractUpdate) AddDeployedBlock(v int64) *MonitorContractUpdate {
+	_u.mutation.AddDeployedBlock(v)
+	return _u
+}
+
 // SetStatus sets the "status" field.
 func (_u *MonitorContractUpdate) SetStatus(v int8) *MonitorContractUpdate {
 	_u.mutation.ResetStatus()
@@ -197,6 +218,12 @@ func (_u *MonitorContractUpdate) sqlSave(ctx context.Context) (_node int, err er
 			sqljson.Append(u, monitorcontract.FieldAbi, value)
 		})
 	}
+	if value, ok := _u.mutation.DeployedBlock(); ok {
+		_spec.SetField(monitorcontract.FieldDeployedBlock, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedDeployedBlock(); ok {
+		_spec.AddField(monitorcontract.FieldDeployedBlock, field.TypeInt64, value)
+	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(monitorcontract.FieldStatus, field.TypeInt8, value)
 	}
@@ -283,6 +310,27 @@ func (_u *MonitorContractUpdateOne) SetAbi(v json.RawMessage) *MonitorContractUp
 // AppendAbi appends value to the "abi" field.
 func (_u *MonitorContractUpdateOne) AppendAbi(v json.RawMessage) *MonitorContractUpdateOne {
 	_u.mutation.AppendAbi(v)
+	return _u
+}
+
+// SetDeployedBlock sets the "deployed_block" field.
+func (_u *MonitorContractUpdateOne) SetDeployedBlock(v int64) *MonitorContractUpdateOne {
+	_u.mutation.ResetDeployedBlock()
+	_u.mutation.SetDeployedBlock(v)
+	return _u
+}
+
+// SetNillableDeployedBlock sets the "deployed_block" field if the given value is not nil.
+func (_u *MonitorContractUpdateOne) SetNillableDeployedBlock(v *int64) *MonitorContractUpdateOne {
+	if v != nil {
+		_u.SetDeployedBlock(*v)
+	}
+	return _u
+}
+
+// AddDeployedBlock adds value to the "deployed_block" field.
+func (_u *MonitorContractUpdateOne) AddDeployedBlock(v int64) *MonitorContractUpdateOne {
+	_u.mutation.AddDeployedBlock(v)
 	return _u
 }
 
@@ -421,6 +469,12 @@ func (_u *MonitorContractUpdateOne) sqlSave(ctx context.Context) (_node *Monitor
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, monitorcontract.FieldAbi, value)
 		})
+	}
+	if value, ok := _u.mutation.DeployedBlock(); ok {
+		_spec.SetField(monitorcontract.FieldDeployedBlock, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedDeployedBlock(); ok {
+		_spec.AddField(monitorcontract.FieldDeployedBlock, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(monitorcontract.FieldStatus, field.TypeInt8, value)

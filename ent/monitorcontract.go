@@ -27,6 +27,8 @@ type MonitorContract struct {
 	Name string `json:"name,omitempty"`
 	// Contract ABI definition
 	Abi json.RawMessage `json:"abi,omitempty"`
+	// Contract deployment block
+	DeployedBlock int64 `json:"deployed_block,omitempty"`
 	// Whether to enable monitoring (0: stop, 1: run)
 	Status       int8 `json:"status,omitempty"`
 	selectValues sql.SelectValues
@@ -39,7 +41,7 @@ func (*MonitorContract) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case monitorcontract.FieldAbi:
 			values[i] = new([]byte)
-		case monitorcontract.FieldChainID, monitorcontract.FieldStatus:
+		case monitorcontract.FieldChainID, monitorcontract.FieldDeployedBlock, monitorcontract.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case monitorcontract.FieldAddress, monitorcontract.FieldName:
 			values[i] = new(sql.NullString)
@@ -91,6 +93,12 @@ func (_m *MonitorContract) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &_m.Abi); err != nil {
 					return fmt.Errorf("unmarshal field abi: %w", err)
 				}
+			}
+		case monitorcontract.FieldDeployedBlock:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field deployed_block", values[i])
+			} else if value.Valid {
+				_m.DeployedBlock = value.Int64
 			}
 		case monitorcontract.FieldStatus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -145,6 +153,9 @@ func (_m *MonitorContract) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("abi=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Abi))
+	builder.WriteString(", ")
+	builder.WriteString("deployed_block=")
+	builder.WriteString(fmt.Sprintf("%v", _m.DeployedBlock))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Status))

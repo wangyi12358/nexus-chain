@@ -8,6 +8,30 @@ import (
 	"nexus-chain/ent"
 )
 
+// The ChainFunc type is an adapter to allow the use of ordinary
+// function as Chain mutator.
+type ChainFunc func(context.Context, *ent.ChainMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChainFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ChainMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChainMutation", m)
+}
+
+// The ChainNodeFunc type is an adapter to allow the use of ordinary
+// function as ChainNode mutator.
+type ChainNodeFunc func(context.Context, *ent.ChainNodeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChainNodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ChainNodeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChainNodeMutation", m)
+}
+
 // The MonitorContractFunc type is an adapter to allow the use of ordinary
 // function as MonitorContract mutator.
 type MonitorContractFunc func(context.Context, *ent.MonitorContractMutation) (ent.Value, error)
@@ -30,6 +54,18 @@ func (f MonitorEventFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MonitorEventMutation", m)
+}
+
+// The MonitorEventCursorFunc type is an adapter to allow the use of ordinary
+// function as MonitorEventCursor mutator.
+type MonitorEventCursorFunc func(context.Context, *ent.MonitorEventCursorMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MonitorEventCursorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MonitorEventCursorMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MonitorEventCursorMutation", m)
 }
 
 // The ParsedEventsLogFunc type is an adapter to allow the use of ordinary

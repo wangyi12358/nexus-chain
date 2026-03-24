@@ -6,11 +6,20 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Chain is the predicate function for chain builders.
+type Chain func(*sql.Selector)
+
+// ChainNode is the predicate function for chainnode builders.
+type ChainNode func(*sql.Selector)
+
 // MonitorContract is the predicate function for monitorcontract builders.
 type MonitorContract func(*sql.Selector)
 
 // MonitorEvent is the predicate function for monitorevent builders.
 type MonitorEvent func(*sql.Selector)
+
+// MonitorEventCursor is the predicate function for monitoreventcursor builders.
+type MonitorEventCursor func(*sql.Selector)
 
 // ParsedEventsLog is the predicate function for parsedeventslog builders.
 type ParsedEventsLog func(*sql.Selector)

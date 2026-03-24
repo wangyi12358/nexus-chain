@@ -3,6 +3,7 @@ package scanner
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"nexus-chain/internal/monitoring/shared"
 	ethutil "nexus-chain/pkg/ethereum"
@@ -22,7 +23,7 @@ func (s *BlockScanner) scanTarget(ctx context.Context, target *shared.EventSubsc
 		return fmt.Errorf("get latest block: %w", err)
 	}
 
-	fromBlock := nextScanStart(target.Event.LastBlock, latestBlock)
+	fromBlock := nextScanStart(target.Cursor.ScanLastBlock, latestBlock)
 	toBlock := int64(latestBlock)
 	if fromBlock > toBlock {
 		return nil
@@ -46,12 +47,13 @@ func (s *BlockScanner) scanTarget(ctx context.Context, target *shared.EventSubsc
 			}
 		}
 
-		if err := s.db.MonitorEvent.UpdateOneID(target.Event.ID).
-			SetLastBlock(end).
+		if err := s.db.MonitorEventCursor.UpdateOneID(target.Cursor.ID).
+			SetScanLastBlock(end).
+			SetLastScannedAt(time.Now()).
 			Exec(ctx); err != nil {
 			return fmt.Errorf("update last_block to %d: %w", end, err)
 		}
-		target.Event.LastBlock = end
+		target.Cursor.ScanLastBlock = end
 	}
 
 	return nil

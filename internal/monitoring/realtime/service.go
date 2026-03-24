@@ -8,7 +8,6 @@ import (
 
 	"nexus-chain/ent"
 	"nexus-chain/internal/monitoring/shared"
-	"nexus-chain/pkg/config"
 	"nexus-chain/pkg/rabbitmq"
 
 	"go.uber.org/fx"
@@ -21,7 +20,6 @@ const (
 
 type EventListener struct {
 	db             *ent.Client
-	cfg            *config.Config
 	rabbitmqClient *rabbitmq.Client
 	cancel         context.CancelFunc
 	wg             sync.WaitGroup
@@ -34,10 +32,9 @@ type managedSubscription struct {
 	signature string
 }
 
-func New(db *ent.Client, cfg *config.Config, client *rabbitmq.Client) *EventListener {
+func New(db *ent.Client, client *rabbitmq.Client) *EventListener {
 	return &EventListener{
 		db:             db,
-		cfg:            cfg,
 		rabbitmqClient: client,
 		subscriptions:  make(map[string]*managedSubscription),
 	}
@@ -101,7 +98,7 @@ func (l *EventListener) refreshLoop(ctx context.Context) {
 }
 
 func (l *EventListener) refreshSubscriptions(ctx context.Context, runCtx context.Context) error {
-	desiredSubscriptions, err := shared.LoadRealtimeSubscriptions(ctx, l.db, l.cfg, l.rabbitmqClient)
+	desiredSubscriptions, err := shared.LoadRealtimeSubscriptions(ctx, l.db, l.rabbitmqClient)
 	if err != nil {
 		return err
 	}

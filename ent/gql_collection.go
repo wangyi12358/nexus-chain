@@ -4,12 +4,219 @@ package ent
 
 import (
 	"context"
+	"nexus-chain/ent/chain"
+	"nexus-chain/ent/chainnode"
 	"nexus-chain/ent/monitorcontract"
 	"nexus-chain/ent/monitorevent"
+	"nexus-chain/ent/monitoreventcursor"
 	"nexus-chain/ent/parsedeventslog"
 
 	"github.com/99designs/gqlgen/graphql"
 )
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *ChainQuery) CollectFields(ctx context.Context, satisfies ...string) (*ChainQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *ChainQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(chain.Columns))
+		selectedFields = []string{chain.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "chainID":
+			if _, ok := fieldSeen[chain.FieldChainID]; !ok {
+				selectedFields = append(selectedFields, chain.FieldChainID)
+				fieldSeen[chain.FieldChainID] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[chain.FieldName]; !ok {
+				selectedFields = append(selectedFields, chain.FieldName)
+				fieldSeen[chain.FieldName] = struct{}{}
+			}
+		case "nativeSymbol":
+			if _, ok := fieldSeen[chain.FieldNativeSymbol]; !ok {
+				selectedFields = append(selectedFields, chain.FieldNativeSymbol)
+				fieldSeen[chain.FieldNativeSymbol] = struct{}{}
+			}
+		case "confirmations":
+			if _, ok := fieldSeen[chain.FieldConfirmations]; !ok {
+				selectedFields = append(selectedFields, chain.FieldConfirmations)
+				fieldSeen[chain.FieldConfirmations] = struct{}{}
+			}
+		case "scanBatchSize":
+			if _, ok := fieldSeen[chain.FieldScanBatchSize]; !ok {
+				selectedFields = append(selectedFields, chain.FieldScanBatchSize)
+				fieldSeen[chain.FieldScanBatchSize] = struct{}{}
+			}
+		case "status":
+			if _, ok := fieldSeen[chain.FieldStatus]; !ok {
+				selectedFields = append(selectedFields, chain.FieldStatus)
+				fieldSeen[chain.FieldStatus] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[chain.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, chain.FieldCreatedAt)
+				fieldSeen[chain.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[chain.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, chain.FieldUpdatedAt)
+				fieldSeen[chain.FieldUpdatedAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type chainPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []ChainPaginateOption
+}
+
+func newChainPaginateArgs(rv map[string]any) *chainPaginateArgs {
+	args := &chainPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*ChainWhereInput); ok {
+		args.opts = append(args.opts, WithChainFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *ChainNodeQuery) CollectFields(ctx context.Context, satisfies ...string) (*ChainNodeQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *ChainNodeQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(chainnode.Columns))
+		selectedFields = []string{chainnode.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "chainID":
+			if _, ok := fieldSeen[chainnode.FieldChainID]; !ok {
+				selectedFields = append(selectedFields, chainnode.FieldChainID)
+				fieldSeen[chainnode.FieldChainID] = struct{}{}
+			}
+		case "nodeType":
+			if _, ok := fieldSeen[chainnode.FieldNodeType]; !ok {
+				selectedFields = append(selectedFields, chainnode.FieldNodeType)
+				fieldSeen[chainnode.FieldNodeType] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[chainnode.FieldName]; !ok {
+				selectedFields = append(selectedFields, chainnode.FieldName)
+				fieldSeen[chainnode.FieldName] = struct{}{}
+			}
+		case "url":
+			if _, ok := fieldSeen[chainnode.FieldURL]; !ok {
+				selectedFields = append(selectedFields, chainnode.FieldURL)
+				fieldSeen[chainnode.FieldURL] = struct{}{}
+			}
+		case "priority":
+			if _, ok := fieldSeen[chainnode.FieldPriority]; !ok {
+				selectedFields = append(selectedFields, chainnode.FieldPriority)
+				fieldSeen[chainnode.FieldPriority] = struct{}{}
+			}
+		case "status":
+			if _, ok := fieldSeen[chainnode.FieldStatus]; !ok {
+				selectedFields = append(selectedFields, chainnode.FieldStatus)
+				fieldSeen[chainnode.FieldStatus] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[chainnode.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, chainnode.FieldCreatedAt)
+				fieldSeen[chainnode.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[chainnode.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, chainnode.FieldUpdatedAt)
+				fieldSeen[chainnode.FieldUpdatedAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type chainnodePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []ChainNodePaginateOption
+}
+
+func newChainNodePaginateArgs(rv map[string]any) *chainnodePaginateArgs {
+	args := &chainnodePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*ChainNodeWhereInput); ok {
+		args.opts = append(args.opts, WithChainNodeFilter(v.Filter))
+	}
+	return args
+}
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (_q *MonitorContractQuery) CollectFields(ctx context.Context, satisfies ...string) (*MonitorContractQuery, error) {
@@ -51,6 +258,11 @@ func (_q *MonitorContractQuery) collectField(ctx context.Context, oneNode bool, 
 			if _, ok := fieldSeen[monitorcontract.FieldAbi]; !ok {
 				selectedFields = append(selectedFields, monitorcontract.FieldAbi)
 				fieldSeen[monitorcontract.FieldAbi] = struct{}{}
+			}
+		case "deployedBlock":
+			if _, ok := fieldSeen[monitorcontract.FieldDeployedBlock]; !ok {
+				selectedFields = append(selectedFields, monitorcontract.FieldDeployedBlock)
+				fieldSeen[monitorcontract.FieldDeployedBlock] = struct{}{}
 			}
 		case "status":
 			if _, ok := fieldSeen[monitorcontract.FieldStatus]; !ok {
@@ -139,11 +351,6 @@ func (_q *MonitorEventQuery) collectField(ctx context.Context, oneNode bool, opC
 				selectedFields = append(selectedFields, monitorevent.FieldStatus)
 				fieldSeen[monitorevent.FieldStatus] = struct{}{}
 			}
-		case "lastBlock":
-			if _, ok := fieldSeen[monitorevent.FieldLastBlock]; !ok {
-				selectedFields = append(selectedFields, monitorevent.FieldLastBlock)
-				fieldSeen[monitorevent.FieldLastBlock] = struct{}{}
-			}
 		case "id":
 		case "__typename":
 		default:
@@ -186,6 +393,93 @@ func newMonitorEventPaginateArgs(rv map[string]any) *monitoreventPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *MonitorEventCursorQuery) CollectFields(ctx context.Context, satisfies ...string) (*MonitorEventCursorQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *MonitorEventCursorQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(monitoreventcursor.Columns))
+		selectedFields = []string{monitoreventcursor.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "eventID":
+			if _, ok := fieldSeen[monitoreventcursor.FieldEventID]; !ok {
+				selectedFields = append(selectedFields, monitoreventcursor.FieldEventID)
+				fieldSeen[monitoreventcursor.FieldEventID] = struct{}{}
+			}
+		case "scanLastBlock":
+			if _, ok := fieldSeen[monitoreventcursor.FieldScanLastBlock]; !ok {
+				selectedFields = append(selectedFields, monitoreventcursor.FieldScanLastBlock)
+				fieldSeen[monitoreventcursor.FieldScanLastBlock] = struct{}{}
+			}
+		case "lastScannedAt":
+			if _, ok := fieldSeen[monitoreventcursor.FieldLastScannedAt]; !ok {
+				selectedFields = append(selectedFields, monitoreventcursor.FieldLastScannedAt)
+				fieldSeen[monitoreventcursor.FieldLastScannedAt] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[monitoreventcursor.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, monitoreventcursor.FieldCreatedAt)
+				fieldSeen[monitoreventcursor.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[monitoreventcursor.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, monitoreventcursor.FieldUpdatedAt)
+				fieldSeen[monitoreventcursor.FieldUpdatedAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type monitoreventcursorPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []MonitorEventCursorPaginateOption
+}
+
+func newMonitorEventCursorPaginateArgs(rv map[string]any) *monitoreventcursorPaginateArgs {
+	args := &monitoreventcursorPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*MonitorEventCursorWhereInput); ok {
+		args.opts = append(args.opts, WithMonitorEventCursorFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (_q *ParsedEventsLogQuery) CollectFields(ctx context.Context, satisfies ...string) (*ParsedEventsLogQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -210,6 +504,11 @@ func (_q *ParsedEventsLogQuery) collectField(ctx context.Context, oneNode bool, 
 			if _, ok := fieldSeen[parsedeventslog.FieldUID]; !ok {
 				selectedFields = append(selectedFields, parsedeventslog.FieldUID)
 				fieldSeen[parsedeventslog.FieldUID] = struct{}{}
+			}
+		case "chainID":
+			if _, ok := fieldSeen[parsedeventslog.FieldChainID]; !ok {
+				selectedFields = append(selectedFields, parsedeventslog.FieldChainID)
+				fieldSeen[parsedeventslog.FieldChainID] = struct{}{}
 			}
 		case "eventID":
 			if _, ok := fieldSeen[parsedeventslog.FieldEventID]; !ok {

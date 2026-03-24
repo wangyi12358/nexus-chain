@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"nexus-chain/ent"
-	"nexus-chain/pkg/config"
 	"nexus-chain/pkg/rabbitmq"
 
 	"go.uber.org/fx"
@@ -20,14 +19,13 @@ const (
 
 type BlockScanner struct {
 	db             *ent.Client
-	cfg            *config.Config
 	rabbitmqClient *rabbitmq.Client
 	cancel         context.CancelFunc
 	wg             sync.WaitGroup
 }
 
-func New(db *ent.Client, cfg *config.Config, client *rabbitmq.Client) *BlockScanner {
-	return &BlockScanner{db: db, cfg: cfg, rabbitmqClient: client}
+func New(db *ent.Client, client *rabbitmq.Client) *BlockScanner {
+	return &BlockScanner{db: db, rabbitmqClient: client}
 }
 
 func StartServer(lc fx.Lifecycle, scanner *BlockScanner) {

@@ -32,6 +32,8 @@ func (ParsedEventsLog) Fields() []ent.Field {
 		field.String("uid").
 			MaxLen(128).
 			Comment("Business UID"),
+		field.Int("chain_id").
+			Comment("Chain ID"),
 		field.UUID("event_id", uuid.UUID{}).
 			Comment("Foreign key to monitor_events.id"),
 		field.Int64("block_number").
@@ -55,8 +57,9 @@ func (ParsedEventsLog) Fields() []ent.Field {
 // Indexes of the ParsedEventsLog.
 func (ParsedEventsLog) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("block_number"),
-		index.Fields("tx_hash", "log_index").
+		index.Fields("chain_id", "block_number"),
+		index.Fields("event_id", "block_number"),
+		index.Fields("chain_id", "tx_hash", "log_index").
 			Unique(),
 	}
 }

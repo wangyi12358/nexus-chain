@@ -55,20 +55,6 @@ func (_c *MonitorEventCreate) SetNillableStatus(v *int8) *MonitorEventCreate {
 	return _c
 }
 
-// SetLastBlock sets the "last_block" field.
-func (_c *MonitorEventCreate) SetLastBlock(v int64) *MonitorEventCreate {
-	_c.mutation.SetLastBlock(v)
-	return _c
-}
-
-// SetNillableLastBlock sets the "last_block" field if the given value is not nil.
-func (_c *MonitorEventCreate) SetNillableLastBlock(v *int64) *MonitorEventCreate {
-	if v != nil {
-		_c.SetLastBlock(*v)
-	}
-	return _c
-}
-
 // SetID sets the "id" field.
 func (_c *MonitorEventCreate) SetID(v uuid.UUID) *MonitorEventCreate {
 	_c.mutation.SetID(v)
@@ -122,10 +108,6 @@ func (_c *MonitorEventCreate) defaults() {
 		v := monitorevent.DefaultStatus
 		_c.mutation.SetStatus(v)
 	}
-	if _, ok := _c.mutation.LastBlock(); !ok {
-		v := monitorevent.DefaultLastBlock
-		_c.mutation.SetLastBlock(v)
-	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := monitorevent.DefaultID()
 		_c.mutation.SetID(v)
@@ -155,9 +137,6 @@ func (_c *MonitorEventCreate) check() error {
 	}
 	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "MonitorEvent.status"`)}
-	}
-	if _, ok := _c.mutation.LastBlock(); !ok {
-		return &ValidationError{Name: "last_block", err: errors.New(`ent: missing required field "MonitorEvent.last_block"`)}
 	}
 	return nil
 }
@@ -210,10 +189,6 @@ func (_c *MonitorEventCreate) createSpec() (*MonitorEvent, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(monitorevent.FieldStatus, field.TypeInt8, value)
 		_node.Status = value
-	}
-	if value, ok := _c.mutation.LastBlock(); ok {
-		_spec.SetField(monitorevent.FieldLastBlock, field.TypeInt64, value)
-		_node.LastBlock = value
 	}
 	return _node, _spec
 }
@@ -318,24 +293,6 @@ func (u *MonitorEventUpsert) UpdateStatus() *MonitorEventUpsert {
 // AddStatus adds v to the "status" field.
 func (u *MonitorEventUpsert) AddStatus(v int8) *MonitorEventUpsert {
 	u.Add(monitorevent.FieldStatus, v)
-	return u
-}
-
-// SetLastBlock sets the "last_block" field.
-func (u *MonitorEventUpsert) SetLastBlock(v int64) *MonitorEventUpsert {
-	u.Set(monitorevent.FieldLastBlock, v)
-	return u
-}
-
-// UpdateLastBlock sets the "last_block" field to the value that was provided on create.
-func (u *MonitorEventUpsert) UpdateLastBlock() *MonitorEventUpsert {
-	u.SetExcluded(monitorevent.FieldLastBlock)
-	return u
-}
-
-// AddLastBlock adds v to the "last_block" field.
-func (u *MonitorEventUpsert) AddLastBlock(v int64) *MonitorEventUpsert {
-	u.Add(monitorevent.FieldLastBlock, v)
 	return u
 }
 
@@ -447,27 +404,6 @@ func (u *MonitorEventUpsertOne) AddStatus(v int8) *MonitorEventUpsertOne {
 func (u *MonitorEventUpsertOne) UpdateStatus() *MonitorEventUpsertOne {
 	return u.Update(func(s *MonitorEventUpsert) {
 		s.UpdateStatus()
-	})
-}
-
-// SetLastBlock sets the "last_block" field.
-func (u *MonitorEventUpsertOne) SetLastBlock(v int64) *MonitorEventUpsertOne {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.SetLastBlock(v)
-	})
-}
-
-// AddLastBlock adds v to the "last_block" field.
-func (u *MonitorEventUpsertOne) AddLastBlock(v int64) *MonitorEventUpsertOne {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.AddLastBlock(v)
-	})
-}
-
-// UpdateLastBlock sets the "last_block" field to the value that was provided on create.
-func (u *MonitorEventUpsertOne) UpdateLastBlock() *MonitorEventUpsertOne {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.UpdateLastBlock()
 	})
 }
 
@@ -746,27 +682,6 @@ func (u *MonitorEventUpsertBulk) AddStatus(v int8) *MonitorEventUpsertBulk {
 func (u *MonitorEventUpsertBulk) UpdateStatus() *MonitorEventUpsertBulk {
 	return u.Update(func(s *MonitorEventUpsert) {
 		s.UpdateStatus()
-	})
-}
-
-// SetLastBlock sets the "last_block" field.
-func (u *MonitorEventUpsertBulk) SetLastBlock(v int64) *MonitorEventUpsertBulk {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.SetLastBlock(v)
-	})
-}
-
-// AddLastBlock adds v to the "last_block" field.
-func (u *MonitorEventUpsertBulk) AddLastBlock(v int64) *MonitorEventUpsertBulk {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.AddLastBlock(v)
-	})
-}
-
-// UpdateLastBlock sets the "last_block" field to the value that was provided on create.
-func (u *MonitorEventUpsertBulk) UpdateLastBlock() *MonitorEventUpsertBulk {
-	return u.Update(func(s *MonitorEventUpsert) {
-		s.UpdateLastBlock()
 	})
 }
 

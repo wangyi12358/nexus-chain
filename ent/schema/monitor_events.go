@@ -29,9 +29,6 @@ func (MonitorEvent) Fields() []ent.Field {
 		field.Int8("status").
 			Default(1).
 			Comment("Whether to enable monitoring (0: stop, 1: run)"),
-		field.Int64("last_block").
-			Default(0).
-			Comment("Last processed block number"),
 	}
 }
 

@@ -20,6 +20,8 @@ const (
 	FieldName = "name"
 	// FieldAbi holds the string denoting the abi field in the database.
 	FieldAbi = "abi"
+	// FieldDeployedBlock holds the string denoting the deployed_block field in the database.
+	FieldDeployedBlock = "deployed_block"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// Table holds the table name of the monitorcontract in the database.
@@ -33,6 +35,7 @@ var Columns = []string{
 	FieldAddress,
 	FieldName,
 	FieldAbi,
+	FieldDeployedBlock,
 	FieldStatus,
 }
 
@@ -51,6 +54,8 @@ var (
 	AddressValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DefaultDeployedBlock holds the default value on creation for the "deployed_block" field.
+	DefaultDeployedBlock int64
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int8
 	// DefaultID holds the default value on creation for the "id" field.
@@ -78,6 +83,11 @@ func ByAddress(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByDeployedBlock orders the results by the deployed_block field.
+func ByDeployedBlock(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeployedBlock, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

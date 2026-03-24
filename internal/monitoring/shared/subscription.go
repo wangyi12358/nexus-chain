@@ -6,9 +6,10 @@ import (
 	"strings"
 
 	"nexus-chain/ent"
+	"nexus-chain/ent/chainnode"
 	"nexus-chain/ent/monitorcontract"
 	"nexus-chain/ent/monitorevent"
-	"nexus-chain/pkg/config"
+	"nexus-chain/ent/monitoreventcursor"
 	ethutil "nexus-chain/pkg/ethereum"
 	"nexus-chain/pkg/rabbitmq"
 
@@ -20,31 +21,28 @@ const ActiveStatus = int8(1)
 type EventSubscription struct {
 	Contract *ent.MonitorContract
 	Event    *ent.MonitorEvent
+	Cursor   *ent.MonitorEventCursor
 	ABIEvent abi.Event
 	RPCURL   string
 	WSURL    string
 }
 
-func LoadRealtimeSubscriptions(ctx context.Context, db *ent.Client, cfg *config.Config, publisher rabbitmq.Publisher) ([]*EventSubscription, error) {
-	wsURL, err := cfg.WsUrl()
+func LoadRealtimeSubscriptions(ctx context.Context, db *ent.Client, publisher rabbitmq.Publisher) ([]*EventSubscription, error) {
+	nodeURLs, err := loadPreferredNodeURLs(ctx, db, "ws")
 	if err != nil {
 		return nil, err
 	}
 
-	return loadSubscriptions(ctx, db, publisher, func(contract *ent.MonitorContract) (string, string, bool, error) {
-		return "", wsURL, true, nil
-	})
+	return loadSubscriptions(ctx, db, publisher, nodeURLs, false)
 }
 
-func LoadScanSubscriptions(ctx context.Context, db *ent.Client, cfg *config.Config, publisher rabbitmq.Publisher) ([]*EventSubscription, error) {
-	rpcURL, err := cfg.RpcUrl()
+func LoadScanSubscriptions(ctx context.Context, db *ent.Client, publisher rabbitmq.Publisher) ([]*EventSubscription, error) {
+	nodeURLs, err := loadPreferredNodeURLs(ctx, db, "rpc")
 	if err != nil {
 		return nil, err
 	}
 
-	return loadSubscriptions(ctx, db, publisher, func(contract *ent.MonitorContract) (string, string, bool, error) {
-		return rpcURL, "", true, nil
-	})
+	return loadSubscriptions(ctx, db, publisher, nodeURLs, true)
 }
 
 func (s *EventSubscription) Key() string {
@@ -66,7 +64,8 @@ func loadSubscriptions(
 	ctx context.Context,
 	db *ent.Client,
 	publisher rabbitmq.Publisher,
-	resolveNodeURLs func(contract *ent.MonitorContract) (rpcURL, wsURL string, ok bool, err error),
+	nodeURLs map[int]string,
+	withCursor bool,
 ) ([]*EventSubscription, error) {
 	contracts, err := db.MonitorContract.Query().
 		Where(monitorcontract.StatusEQ(ActiveStatus)).
@@ -75,13 +74,23 @@ func loadSubscriptions(
 		return nil, err
 	}
 
-	subscriptions := make([]*EventSubscription, 0)
-	for _, contract := range contracts {
-		rpcURL, wsURL, ok, err := resolveNodeURLs(contract)
+	cursorByEvent := map[string]*ent.MonitorEventCursor{}
+	if withCursor {
+		cursors, err := db.MonitorEventCursor.Query().
+			All(ctx)
 		if err != nil {
 			return nil, err
 		}
-		if !ok {
+		for _, cursor := range cursors {
+			cursorByEvent[cursor.EventID.String()] = cursor
+		}
+	}
+
+	subscriptions := make([]*EventSubscription, 0)
+	for _, contract := range contracts {
+		nodeURL, ok := nodeURLs[contract.ChainID]
+		if !ok || nodeURL == "" {
+			log.Printf("skip contract %s because no active node is configured for chain_id=%d", contract.Address, contract.ChainID)
 			continue
 		}
 
@@ -111,15 +120,60 @@ func loadSubscriptions(
 				return nil, err
 			}
 
+			var cursor *ent.MonitorEventCursor
+			if withCursor {
+				cursor = cursorByEvent[eventRow.ID.String()]
+				if cursor == nil {
+					cursor, err = db.MonitorEventCursor.Create().
+						SetEventID(eventRow.ID).
+						Save(ctx)
+					if err != nil {
+						if ent.IsConstraintError(err) {
+							cursor, err = db.MonitorEventCursor.Query().
+								Where(monitoreventcursor.EventIDEQ(eventRow.ID)).
+								Only(ctx)
+						}
+						if err != nil {
+							return nil, err
+						}
+					}
+					cursorByEvent[eventRow.ID.String()] = cursor
+				}
+			}
+
 			subscriptions = append(subscriptions, &EventSubscription{
 				Contract: contract,
 				Event:    eventRow,
+				Cursor:   cursor,
 				ABIEvent: abiEvent,
-				RPCURL:   rpcURL,
-				WSURL:    wsURL,
+				RPCURL:   nodeURL,
+				WSURL:    nodeURL,
 			})
 		}
 	}
 
 	return subscriptions, nil
+}
+
+func loadPreferredNodeURLs(ctx context.Context, db *ent.Client, nodeType string) (map[int]string, error) {
+	nodes, err := db.ChainNode.Query().
+		Where(
+			chainnode.NodeTypeEQ(nodeType),
+			chainnode.StatusEQ(ActiveStatus),
+		).
+		Order(chainnode.ByPriority()).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	nodeURLs := make(map[int]string)
+	for _, node := range nodes {
+		if _, exists := nodeURLs[node.ChainID]; exists {
+			continue
+		}
+		nodeURLs[node.ChainID] = node.URL
+	}
+
+	return nodeURLs, nil
 }
