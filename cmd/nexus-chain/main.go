@@ -1,9 +1,9 @@
 package main
 
 import (
-	"nexus-chain/internal/monitoring/realtime"
-	"nexus-chain/internal/monitoring/scanner"
 	"nexus-chain/internal/net"
+	"nexus-chain/internal/watcher/realtime"
+	"nexus-chain/internal/watcher/scanner"
 	"nexus-chain/pkg/config"
 	"nexus-chain/pkg/database"
 	"nexus-chain/pkg/rabbitmq"

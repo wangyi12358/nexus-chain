@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"time"
 
-	"nexus-chain/internal/monitoring/shared"
+	"nexus-chain/internal/watcher/core"
 	ethutil "nexus-chain/pkg/ethereum"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func (s *BlockScanner) scanTarget(ctx context.Context, target *shared.EventSubscription) error {
+func (s *BlockScanner) scanTarget(ctx context.Context, target *core.EventSubscription) error {
 	client, err := ethclient.DialContext(ctx, target.RpcUrl)
 	if err != nil {
 		return fmt.Errorf("dial rpc: %w", err)
@@ -42,7 +42,7 @@ func (s *BlockScanner) scanTarget(ctx context.Context, target *shared.EventSubsc
 		}
 
 		for _, vLog := range logs {
-			if err := shared.ProcessHistoricalLog(ctx, s.db, s.rabbitmqClient, target, vLog); err != nil {
+			if err := core.ProcessHistoricalLog(ctx, s.db, s.rabbitmqClient, target, vLog); err != nil {
 				return fmt.Errorf("handle historical log tx=%s index=%d: %w", vLog.TxHash.Hex(), vLog.Index, err)
 			}
 		}

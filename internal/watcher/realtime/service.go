@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"nexus-chain/ent"
-	"nexus-chain/internal/monitoring/shared"
+	"nexus-chain/internal/watcher/core"
 	"nexus-chain/pkg/rabbitmq"
 
 	"go.uber.org/fx"
@@ -98,12 +98,12 @@ func (l *EventListener) refreshLoop(ctx context.Context) {
 }
 
 func (l *EventListener) refreshSubscriptions(ctx context.Context, runCtx context.Context) error {
-	desiredSubscriptions, err := shared.LoadRealtimeSubscriptions(ctx, l.db, l.rabbitmqClient)
+	desiredSubscriptions, err := core.LoadRealtimeSubscriptions(ctx, l.db, l.rabbitmqClient)
 	if err != nil {
 		return err
 	}
 
-	desiredByKey := make(map[string]*shared.EventSubscription, len(desiredSubscriptions))
+	desiredByKey := make(map[string]*core.EventSubscription, len(desiredSubscriptions))
 	for _, subscription := range desiredSubscriptions {
 		desiredByKey[subscription.Key()] = subscription
 	}
@@ -131,7 +131,7 @@ func (l *EventListener) refreshSubscriptions(ctx context.Context, runCtx context
 		}
 
 		l.wg.Add(1)
-		go func(subscriptionCtx context.Context, sub *shared.EventSubscription) {
+		go func(subscriptionCtx context.Context, sub *core.EventSubscription) {
 			defer l.wg.Done()
 			l.runSubscriptionLoop(subscriptionCtx, sub)
 		}(subCtx, desired)
