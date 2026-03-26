@@ -36,6 +36,14 @@ func (_c *ParsedEventsLogCreate) SetChainID(v int) *ParsedEventsLogCreate {
 	return _c
 }
 
+// SetNillableChainID sets the "chain_id" field if the given value is not nil.
+func (_c *ParsedEventsLogCreate) SetNillableChainID(v *int) *ParsedEventsLogCreate {
+	if v != nil {
+		_c.SetChainID(*v)
+	}
+	return _c
+}
+
 // SetEventID sets the "event_id" field.
 func (_c *ParsedEventsLogCreate) SetEventID(v uuid.UUID) *ParsedEventsLogCreate {
 	_c.mutation.SetEventID(v)
@@ -129,6 +137,10 @@ func (_c *ParsedEventsLogCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ParsedEventsLogCreate) defaults() {
+	if _, ok := _c.mutation.ChainID(); !ok {
+		v := parsedeventslog.DefaultChainID
+		_c.mutation.SetChainID(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := parsedeventslog.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)

@@ -23,8 +23,8 @@ type EventSubscription struct {
 	Event    *ent.MonitorEvent
 	Cursor   *ent.MonitorEventCursor
 	ABIEvent abi.Event
-	RPCURL   string
-	WSURL    string
+	RpcUrl   string
+	WsUrl    string
 }
 
 func LoadRealtimeSubscriptions(ctx context.Context, db *ent.Client, publisher rabbitmq.Publisher) ([]*EventSubscription, error) {
@@ -53,7 +53,7 @@ func (s *EventSubscription) RealtimeSignature() string {
 	return strings.Join([]string{
 		s.Contract.ID.String(),
 		s.Contract.Address,
-		s.WSURL,
+		s.WsUrl,
 		string(s.Contract.Abi),
 		s.Event.EventName,
 		s.ABIEvent.ID.Hex(),
@@ -146,8 +146,8 @@ func loadSubscriptions(
 				Event:    eventRow,
 				Cursor:   cursor,
 				ABIEvent: abiEvent,
-				RPCURL:   nodeURL,
-				WSURL:    nodeURL,
+				RpcUrl:   nodeURL,
+				WsUrl:    nodeURL,
 			})
 		}
 	}
@@ -168,6 +168,7 @@ func loadPreferredNodeURLs(ctx context.Context, db *ent.Client, nodeType string)
 	}
 
 	nodeURLs := make(map[int]string)
+
 	for _, node := range nodes {
 		if _, exists := nodeURLs[node.ChainID]; exists {
 			continue

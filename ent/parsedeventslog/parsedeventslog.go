@@ -60,6 +60,8 @@ func ValidColumn(column string) bool {
 var (
 	// UIDValidator is a validator for the "uid" field. It is called by the builders before save.
 	UIDValidator func(string) error
+	// DefaultChainID holds the default value on creation for the "chain_id" field.
+	DefaultChainID int
 	// TxHashValidator is a validator for the "tx_hash" field. It is called by the builders before save.
 	TxHashValidator func(string) error
 	// LogIndexValidator is a validator for the "log_index" field. It is called by the builders before save.

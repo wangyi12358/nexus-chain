@@ -134,7 +134,7 @@ var (
 	ParsedEventsLogColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "uid", Type: field.TypeString, Size: 128},
-		{Name: "chain_id", Type: field.TypeInt},
+		{Name: "chain_id", Type: field.TypeInt, Default: 11155111},
 		{Name: "event_id", Type: field.TypeUUID},
 		{Name: "block_number", Type: field.TypeInt64},
 		{Name: "tx_hash", Type: field.TypeString, Size: 66},

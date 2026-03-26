@@ -33,7 +33,7 @@ func (l *EventListener) runSubscriptionLoop(ctx context.Context, sub *shared.Eve
 }
 
 func (l *EventListener) subscribeOnce(ctx context.Context, sub *shared.EventSubscription) error {
-	client, err := ethclient.DialContext(ctx, sub.WSURL)
+	client, err := ethclient.DialContext(ctx, sub.WsUrl)
 	if err != nil {
 		return fmt.Errorf("dial websocket rpc: %w", err)
 	}

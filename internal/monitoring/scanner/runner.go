@@ -12,7 +12,7 @@ import (
 )
 
 func (s *BlockScanner) scanTarget(ctx context.Context, target *shared.EventSubscription) error {
-	client, err := ethclient.DialContext(ctx, target.RPCURL)
+	client, err := ethclient.DialContext(ctx, target.RpcUrl)
 	if err != nil {
 		return fmt.Errorf("dial rpc: %w", err)
 	}

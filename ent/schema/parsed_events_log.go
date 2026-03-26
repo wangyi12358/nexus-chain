@@ -33,7 +33,8 @@ func (ParsedEventsLog) Fields() []ent.Field {
 			MaxLen(128).
 			Comment("Business UID"),
 		field.Int("chain_id").
-			Comment("Chain ID"),
+			Comment("Chain ID").
+			Default(11155111),
 		field.UUID("event_id", uuid.UUID{}).
 			Comment("Foreign key to monitor_events.id"),
 		field.Int64("block_number").

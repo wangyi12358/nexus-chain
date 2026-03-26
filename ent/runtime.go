@@ -161,6 +161,10 @@ func init() {
 	parsedeventslogDescUID := parsedeventslogFields[1].Descriptor()
 	// parsedeventslog.UIDValidator is a validator for the "uid" field. It is called by the builders before save.
 	parsedeventslog.UIDValidator = parsedeventslogDescUID.Validators[0].(func(string) error)
+	// parsedeventslogDescChainID is the schema descriptor for chain_id field.
+	parsedeventslogDescChainID := parsedeventslogFields[2].Descriptor()
+	// parsedeventslog.DefaultChainID holds the default value on creation for the chain_id field.
+	parsedeventslog.DefaultChainID = parsedeventslogDescChainID.Default.(int)
 	// parsedeventslogDescTxHash is the schema descriptor for tx_hash field.
 	parsedeventslogDescTxHash := parsedeventslogFields[5].Descriptor()
 	// parsedeventslog.TxHashValidator is a validator for the "tx_hash" field. It is called by the builders before save.
