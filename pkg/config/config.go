@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -10,7 +8,6 @@ type (
 	Config struct {
 		HTTP     HTTP
 		DB       DB
-		Chain    Chain
 		RabbitMQ RabbitMQ
 	}
 	DB struct {

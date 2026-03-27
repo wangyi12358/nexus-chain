@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	scanInterval  = 30 * time.Second
-	scanBatchSize = int64(1000)
+	scanInterval  = 10 * time.Minute
+	scanBatchSize = int64(500)
 )
 
 type BlockScanner struct {
