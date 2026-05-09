@@ -89,6 +89,29 @@ RABBITMQ_URL=amqp://guest:guest@localhost:5672/
 - `HTTP_PORT`：Gin 服务监听地址，当前实现要求带前导冒号，例如 `:8080`
 - `RABBITMQ_URL`：RabbitMQ 连接 URL
 
+## Docker 运行
+
+构建镜像：
+
+```bash
+docker build -f build/package/Dockerfile -t nexus-chain .
+```
+
+运行容器 (需要配置环境变量)：
+
+```bash
+docker run -p 8080:8080 --env-file .env nexus-chain
+```
+
+使用 Docker Compose 一键启动（包含 PostgreSQL 和 RabbitMQ）：
+
+```bash
+cd deployments
+docker-compose up -d
+```
+
+完整部署说明（环境变量、常用命令、数据持久化等）见 [deployments/README.md](deployments/README.md)。
+
 ## 本地启动
 
 1. 准备数据库，并创建 `DB_NAME` 对应的库。
@@ -231,22 +254,6 @@ go build -o bin/nexus-chain ./cmd/nexus-chain
 ```bash
 gofmt -w .
 ```
-
-## Docker
-
-构建镜像：
-
-```bash
-docker build -f build/package/Dockerfile -t nexus-chain .
-```
-
-运行容器 (需要配置环境变量)：
-
-```bash
-docker run -p 8080:8080 --env-file .env nexus-chain
-```
-
-`deployments/docker-compose.yml` 提供完整部署配置，包括 PostgreSQL 和 RabbitMQ。
 
 ## 示例
 
