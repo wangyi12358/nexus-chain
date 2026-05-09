@@ -3,7 +3,8 @@
 ## 快速开始
 
 ```bash
-cd deployments
+git clone https://github.com/wangyi12358/nexus-chain.git
+cd nexus-chain/deployments
 docker-compose up -d
 ```
 
