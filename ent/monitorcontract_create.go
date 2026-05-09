@@ -48,6 +48,20 @@ func (_c *MonitorContractCreate) SetAbi(v json.RawMessage) *MonitorContractCreat
 	return _c
 }
 
+// SetDeployedBlock sets the "deployed_block" field.
+func (_c *MonitorContractCreate) SetDeployedBlock(v int64) *MonitorContractCreate {
+	_c.mutation.SetDeployedBlock(v)
+	return _c
+}
+
+// SetNillableDeployedBlock sets the "deployed_block" field if the given value is not nil.
+func (_c *MonitorContractCreate) SetNillableDeployedBlock(v *int64) *MonitorContractCreate {
+	if v != nil {
+		_c.SetDeployedBlock(*v)
+	}
+	return _c
+}
+
 // SetStatus sets the "status" field.
 func (_c *MonitorContractCreate) SetStatus(v int8) *MonitorContractCreate {
 	_c.mutation.SetStatus(v)
@@ -111,6 +125,10 @@ func (_c *MonitorContractCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *MonitorContractCreate) defaults() {
+	if _, ok := _c.mutation.DeployedBlock(); !ok {
+		v := monitorcontract.DefaultDeployedBlock
+		_c.mutation.SetDeployedBlock(v)
+	}
 	if _, ok := _c.mutation.Status(); !ok {
 		v := monitorcontract.DefaultStatus
 		_c.mutation.SetStatus(v)
@@ -144,6 +162,9 @@ func (_c *MonitorContractCreate) check() error {
 	}
 	if _, ok := _c.mutation.Abi(); !ok {
 		return &ValidationError{Name: "abi", err: errors.New(`ent: missing required field "MonitorContract.abi"`)}
+	}
+	if _, ok := _c.mutation.DeployedBlock(); !ok {
+		return &ValidationError{Name: "deployed_block", err: errors.New(`ent: missing required field "MonitorContract.deployed_block"`)}
 	}
 	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "MonitorContract.status"`)}
@@ -199,6 +220,10 @@ func (_c *MonitorContractCreate) createSpec() (*MonitorContract, *sqlgraph.Creat
 	if value, ok := _c.mutation.Abi(); ok {
 		_spec.SetField(monitorcontract.FieldAbi, field.TypeJSON, value)
 		_node.Abi = value
+	}
+	if value, ok := _c.mutation.DeployedBlock(); ok {
+		_spec.SetField(monitorcontract.FieldDeployedBlock, field.TypeInt64, value)
+		_node.DeployedBlock = value
 	}
 	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(monitorcontract.FieldStatus, field.TypeInt8, value)
@@ -307,6 +332,24 @@ func (u *MonitorContractUpsert) SetAbi(v json.RawMessage) *MonitorContractUpsert
 // UpdateAbi sets the "abi" field to the value that was provided on create.
 func (u *MonitorContractUpsert) UpdateAbi() *MonitorContractUpsert {
 	u.SetExcluded(monitorcontract.FieldAbi)
+	return u
+}
+
+// SetDeployedBlock sets the "deployed_block" field.
+func (u *MonitorContractUpsert) SetDeployedBlock(v int64) *MonitorContractUpsert {
+	u.Set(monitorcontract.FieldDeployedBlock, v)
+	return u
+}
+
+// UpdateDeployedBlock sets the "deployed_block" field to the value that was provided on create.
+func (u *MonitorContractUpsert) UpdateDeployedBlock() *MonitorContractUpsert {
+	u.SetExcluded(monitorcontract.FieldDeployedBlock)
+	return u
+}
+
+// AddDeployedBlock adds v to the "deployed_block" field.
+func (u *MonitorContractUpsert) AddDeployedBlock(v int64) *MonitorContractUpsert {
+	u.Add(monitorcontract.FieldDeployedBlock, v)
 	return u
 }
 
@@ -436,6 +479,27 @@ func (u *MonitorContractUpsertOne) SetAbi(v json.RawMessage) *MonitorContractUps
 func (u *MonitorContractUpsertOne) UpdateAbi() *MonitorContractUpsertOne {
 	return u.Update(func(s *MonitorContractUpsert) {
 		s.UpdateAbi()
+	})
+}
+
+// SetDeployedBlock sets the "deployed_block" field.
+func (u *MonitorContractUpsertOne) SetDeployedBlock(v int64) *MonitorContractUpsertOne {
+	return u.Update(func(s *MonitorContractUpsert) {
+		s.SetDeployedBlock(v)
+	})
+}
+
+// AddDeployedBlock adds v to the "deployed_block" field.
+func (u *MonitorContractUpsertOne) AddDeployedBlock(v int64) *MonitorContractUpsertOne {
+	return u.Update(func(s *MonitorContractUpsert) {
+		s.AddDeployedBlock(v)
+	})
+}
+
+// UpdateDeployedBlock sets the "deployed_block" field to the value that was provided on create.
+func (u *MonitorContractUpsertOne) UpdateDeployedBlock() *MonitorContractUpsertOne {
+	return u.Update(func(s *MonitorContractUpsert) {
+		s.UpdateDeployedBlock()
 	})
 }
 
@@ -735,6 +799,27 @@ func (u *MonitorContractUpsertBulk) SetAbi(v json.RawMessage) *MonitorContractUp
 func (u *MonitorContractUpsertBulk) UpdateAbi() *MonitorContractUpsertBulk {
 	return u.Update(func(s *MonitorContractUpsert) {
 		s.UpdateAbi()
+	})
+}
+
+// SetDeployedBlock sets the "deployed_block" field.
+func (u *MonitorContractUpsertBulk) SetDeployedBlock(v int64) *MonitorContractUpsertBulk {
+	return u.Update(func(s *MonitorContractUpsert) {
+		s.SetDeployedBlock(v)
+	})
+}
+
+// AddDeployedBlock adds v to the "deployed_block" field.
+func (u *MonitorContractUpsertBulk) AddDeployedBlock(v int64) *MonitorContractUpsertBulk {
+	return u.Update(func(s *MonitorContractUpsert) {
+		s.AddDeployedBlock(v)
+	})
+}
+
+// UpdateDeployedBlock sets the "deployed_block" field to the value that was provided on create.
+func (u *MonitorContractUpsertBulk) UpdateDeployedBlock() *MonitorContractUpsertBulk {
+	return u.Update(func(s *MonitorContractUpsert) {
+		s.UpdateDeployedBlock()
 	})
 }
 

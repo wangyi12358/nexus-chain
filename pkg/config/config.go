@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -10,7 +8,6 @@ type (
 	Config struct {
 		HTTP     HTTP
 		DB       DB
-		Chain    Chain
 		RabbitMQ RabbitMQ
 	}
 	DB struct {
@@ -24,10 +21,6 @@ type (
 
 	HTTP struct {
 		Port string `env:"HTTP_PORT"`
-	}
-	Chain struct {
-		RpcUrl string `env:"RPC_URL"`
-		WsUrl  string `env:"WS_URL"`
 	}
 	RabbitMQ struct {
 		Enabled      bool   `env:"RABBITMQ_ENABLED" env-default:"false"`
@@ -47,18 +40,4 @@ func New() (*Config, error) {
 	}
 
 	return &cfg, nil
-}
-
-func (c *Config) RpcUrl() (string, error) {
-	if c.Chain.RpcUrl == "" {
-		return "", fmt.Errorf("rpc url not configured")
-	}
-	return c.Chain.RpcUrl, nil
-}
-
-func (c *Config) WsUrl() (string, error) {
-	if c.Chain.WsUrl == "" {
-		return "", fmt.Errorf("ws url not configured")
-	}
-	return c.Chain.WsUrl, nil
 }

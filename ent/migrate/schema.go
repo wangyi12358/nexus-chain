@@ -9,13 +9,69 @@ import (
 )
 
 var (
+	// ChainsColumns holds the columns for the "chains" table.
+	ChainsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "chain_id", Type: field.TypeInt},
+		{Name: "name", Type: field.TypeString, Size: 64},
+		{Name: "native_symbol", Type: field.TypeString, Size: 16},
+		{Name: "confirmations", Type: field.TypeInt, Default: 6},
+		{Name: "scan_batch_size", Type: field.TypeInt, Default: 1000},
+		{Name: "status", Type: field.TypeInt8, Default: 1},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ChainsTable holds the schema information for the "chains" table.
+	ChainsTable = &schema.Table{
+		Name:       "chains",
+		Columns:    ChainsColumns,
+		PrimaryKey: []*schema.Column{ChainsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "chain_chain_id",
+				Unique:  true,
+				Columns: []*schema.Column{ChainsColumns[1]},
+			},
+		},
+	}
+	// ChainNodesColumns holds the columns for the "chain_nodes" table.
+	ChainNodesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "chain_id", Type: field.TypeInt},
+		{Name: "node_type", Type: field.TypeString, Size: 16},
+		{Name: "name", Type: field.TypeString, Size: 64},
+		{Name: "url", Type: field.TypeString, Size: 255},
+		{Name: "priority", Type: field.TypeInt, Default: 100},
+		{Name: "status", Type: field.TypeInt8, Default: 1},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ChainNodesTable holds the schema information for the "chain_nodes" table.
+	ChainNodesTable = &schema.Table{
+		Name:       "chain_nodes",
+		Columns:    ChainNodesColumns,
+		PrimaryKey: []*schema.Column{ChainNodesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "chainnode_chain_id_node_type_status_priority",
+				Unique:  false,
+				Columns: []*schema.Column{ChainNodesColumns[1], ChainNodesColumns[2], ChainNodesColumns[6], ChainNodesColumns[5]},
+			},
+			{
+				Name:    "chainnode_chain_id_node_type_url",
+				Unique:  true,
+				Columns: []*schema.Column{ChainNodesColumns[1], ChainNodesColumns[2], ChainNodesColumns[4]},
+			},
+		},
+	}
 	// MonitorContractsColumns holds the columns for the "monitor_contracts" table.
 	MonitorContractsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "chain_id", Type: field.TypeInt},
-		{Name: "address", Type: field.TypeString, Unique: true, Size: 42},
+		{Name: "address", Type: field.TypeString, Size: 42},
 		{Name: "name", Type: field.TypeString, Size: 64},
 		{Name: "abi", Type: field.TypeJSON},
+		{Name: "deployed_block", Type: field.TypeInt64, Default: 0},
 		{Name: "status", Type: field.TypeInt8, Default: 1},
 	}
 	// MonitorContractsTable holds the schema information for the "monitor_contracts" table.
@@ -38,7 +94,6 @@ var (
 		{Name: "event_name", Type: field.TypeString, Size: 64},
 		{Name: "mq_routing_key", Type: field.TypeString, Size: 64},
 		{Name: "status", Type: field.TypeInt8, Default: 1},
-		{Name: "last_block", Type: field.TypeInt64, Default: 0},
 	}
 	// MonitorEventsTable holds the schema information for the "monitor_events" table.
 	MonitorEventsTable = &schema.Table{
@@ -53,10 +108,33 @@ var (
 			},
 		},
 	}
+	// MonitorEventCursorsColumns holds the columns for the "monitor_event_cursors" table.
+	MonitorEventCursorsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "event_id", Type: field.TypeUUID},
+		{Name: "scan_last_block", Type: field.TypeInt64, Default: 0},
+		{Name: "last_scanned_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// MonitorEventCursorsTable holds the schema information for the "monitor_event_cursors" table.
+	MonitorEventCursorsTable = &schema.Table{
+		Name:       "monitor_event_cursors",
+		Columns:    MonitorEventCursorsColumns,
+		PrimaryKey: []*schema.Column{MonitorEventCursorsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "monitoreventcursor_event_id",
+				Unique:  true,
+				Columns: []*schema.Column{MonitorEventCursorsColumns[1]},
+			},
+		},
+	}
 	// ParsedEventsLogColumns holds the columns for the "parsed_events_log" table.
 	ParsedEventsLogColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "uid", Type: field.TypeString, Size: 128},
+		{Name: "chain_id", Type: field.TypeInt, Default: 11155111},
 		{Name: "event_id", Type: field.TypeUUID},
 		{Name: "block_number", Type: field.TypeInt64},
 		{Name: "tx_hash", Type: field.TypeString, Size: 66},
@@ -71,21 +149,29 @@ var (
 		PrimaryKey: []*schema.Column{ParsedEventsLogColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "parsedeventslog_block_number",
+				Name:    "parsedeventslog_chain_id_block_number",
 				Unique:  false,
-				Columns: []*schema.Column{ParsedEventsLogColumns[3]},
+				Columns: []*schema.Column{ParsedEventsLogColumns[2], ParsedEventsLogColumns[4]},
 			},
 			{
-				Name:    "parsedeventslog_tx_hash_log_index",
+				Name:    "parsedeventslog_event_id_block_number",
+				Unique:  false,
+				Columns: []*schema.Column{ParsedEventsLogColumns[3], ParsedEventsLogColumns[4]},
+			},
+			{
+				Name:    "parsedeventslog_chain_id_tx_hash_log_index",
 				Unique:  true,
-				Columns: []*schema.Column{ParsedEventsLogColumns[4], ParsedEventsLogColumns[5]},
+				Columns: []*schema.Column{ParsedEventsLogColumns[2], ParsedEventsLogColumns[5], ParsedEventsLogColumns[6]},
 			},
 		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		ChainsTable,
+		ChainNodesTable,
 		MonitorContractsTable,
 		MonitorEventsTable,
+		MonitorEventCursorsTable,
 		ParsedEventsLogTable,
 	}
 )

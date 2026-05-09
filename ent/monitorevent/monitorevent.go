@@ -20,8 +20,6 @@ const (
 	FieldMqRoutingKey = "mq_routing_key"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldLastBlock holds the string denoting the last_block field in the database.
-	FieldLastBlock = "last_block"
 	// Table holds the table name of the monitorevent in the database.
 	Table = "monitor_events"
 )
@@ -33,7 +31,6 @@ var Columns = []string{
 	FieldEventName,
 	FieldMqRoutingKey,
 	FieldStatus,
-	FieldLastBlock,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -53,8 +50,6 @@ var (
 	MqRoutingKeyValidator func(string) error
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int8
-	// DefaultLastBlock holds the default value on creation for the "last_block" field.
-	DefaultLastBlock int64
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
@@ -85,9 +80,4 @@ func ByMqRoutingKey(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
-}
-
-// ByLastBlock orders the results by the last_block field.
-func ByLastBlock(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLastBlock, opts...).ToFunc()
 }

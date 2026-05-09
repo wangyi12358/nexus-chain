@@ -24,13 +24,15 @@ func (MonitorContract) Fields() []ent.Field {
 			Comment("Chain ID (e.g., 1 for mainnet, 11155111 for Sepolia)"),
 		field.String("address").
 			MaxLen(42).
-			Unique().
 			Comment("Contract address"),
 		field.String("name").
 			MaxLen(64).
 			Comment("Contract alias for easy identification"),
 		field.JSON("abi", json.RawMessage{}).
 			Comment("Contract ABI definition"),
+		field.Int64("deployed_block").
+			Default(0).
+			Comment("Contract deployment block"),
 		field.Int8("status").
 			Default(1).
 			Comment("Whether to enable monitoring (0: stop, 1: run)"),

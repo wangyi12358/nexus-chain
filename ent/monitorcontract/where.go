@@ -69,6 +69,11 @@ func Name(v string) predicate.MonitorContract {
 	return predicate.MonitorContract(sql.FieldEQ(FieldName, v))
 }
 
+// DeployedBlock applies equality check predicate on the "deployed_block" field. It's identical to DeployedBlockEQ.
+func DeployedBlock(v int64) predicate.MonitorContract {
+	return predicate.MonitorContract(sql.FieldEQ(FieldDeployedBlock, v))
+}
+
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
 func Status(v int8) predicate.MonitorContract {
 	return predicate.MonitorContract(sql.FieldEQ(FieldStatus, v))
@@ -242,6 +247,46 @@ func NameEqualFold(v string) predicate.MonitorContract {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.MonitorContract {
 	return predicate.MonitorContract(sql.FieldContainsFold(FieldName, v))
+}
+
+// DeployedBlockEQ applies the EQ predicate on the "deployed_block" field.
+func DeployedBlockEQ(v int64) predicate.MonitorContract {
+	return predicate.MonitorContract(sql.FieldEQ(FieldDeployedBlock, v))
+}
+
+// DeployedBlockNEQ applies the NEQ predicate on the "deployed_block" field.
+func DeployedBlockNEQ(v int64) predicate.MonitorContract {
+	return predicate.MonitorContract(sql.FieldNEQ(FieldDeployedBlock, v))
+}
+
+// DeployedBlockIn applies the In predicate on the "deployed_block" field.
+func DeployedBlockIn(vs ...int64) predicate.MonitorContract {
+	return predicate.MonitorContract(sql.FieldIn(FieldDeployedBlock, vs...))
+}
+
+// DeployedBlockNotIn applies the NotIn predicate on the "deployed_block" field.
+func DeployedBlockNotIn(vs ...int64) predicate.MonitorContract {
+	return predicate.MonitorContract(sql.FieldNotIn(FieldDeployedBlock, vs...))
+}
+
+// DeployedBlockGT applies the GT predicate on the "deployed_block" field.
+func DeployedBlockGT(v int64) predicate.MonitorContract {
+	return predicate.MonitorContract(sql.FieldGT(FieldDeployedBlock, v))
+}
+
+// DeployedBlockGTE applies the GTE predicate on the "deployed_block" field.
+func DeployedBlockGTE(v int64) predicate.MonitorContract {
+	return predicate.MonitorContract(sql.FieldGTE(FieldDeployedBlock, v))
+}
+
+// DeployedBlockLT applies the LT predicate on the "deployed_block" field.
+func DeployedBlockLT(v int64) predicate.MonitorContract {
+	return predicate.MonitorContract(sql.FieldLT(FieldDeployedBlock, v))
+}
+
+// DeployedBlockLTE applies the LTE predicate on the "deployed_block" field.
+func DeployedBlockLTE(v int64) predicate.MonitorContract {
+	return predicate.MonitorContract(sql.FieldLTE(FieldDeployedBlock, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

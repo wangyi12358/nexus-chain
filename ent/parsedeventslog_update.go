@@ -43,6 +43,27 @@ func (_u *ParsedEventsLogUpdate) SetNillableUID(v *string) *ParsedEventsLogUpdat
 	return _u
 }
 
+// SetChainID sets the "chain_id" field.
+func (_u *ParsedEventsLogUpdate) SetChainID(v int) *ParsedEventsLogUpdate {
+	_u.mutation.ResetChainID()
+	_u.mutation.SetChainID(v)
+	return _u
+}
+
+// SetNillableChainID sets the "chain_id" field if the given value is not nil.
+func (_u *ParsedEventsLogUpdate) SetNillableChainID(v *int) *ParsedEventsLogUpdate {
+	if v != nil {
+		_u.SetChainID(*v)
+	}
+	return _u
+}
+
+// AddChainID adds value to the "chain_id" field.
+func (_u *ParsedEventsLogUpdate) AddChainID(v int) *ParsedEventsLogUpdate {
+	_u.mutation.AddChainID(v)
+	return _u
+}
+
 // SetEventID sets the "event_id" field.
 func (_u *ParsedEventsLogUpdate) SetEventID(v uuid.UUID) *ParsedEventsLogUpdate {
 	_u.mutation.SetEventID(v)
@@ -192,6 +213,12 @@ func (_u *ParsedEventsLogUpdate) sqlSave(ctx context.Context) (_node int, err er
 	if value, ok := _u.mutation.UID(); ok {
 		_spec.SetField(parsedeventslog.FieldUID, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.ChainID(); ok {
+		_spec.SetField(parsedeventslog.FieldChainID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedChainID(); ok {
+		_spec.AddField(parsedeventslog.FieldChainID, field.TypeInt, value)
+	}
 	if value, ok := _u.mutation.EventID(); ok {
 		_spec.SetField(parsedeventslog.FieldEventID, field.TypeUUID, value)
 	}
@@ -246,6 +273,27 @@ func (_u *ParsedEventsLogUpdateOne) SetNillableUID(v *string) *ParsedEventsLogUp
 	if v != nil {
 		_u.SetUID(*v)
 	}
+	return _u
+}
+
+// SetChainID sets the "chain_id" field.
+func (_u *ParsedEventsLogUpdateOne) SetChainID(v int) *ParsedEventsLogUpdateOne {
+	_u.mutation.ResetChainID()
+	_u.mutation.SetChainID(v)
+	return _u
+}
+
+// SetNillableChainID sets the "chain_id" field if the given value is not nil.
+func (_u *ParsedEventsLogUpdateOne) SetNillableChainID(v *int) *ParsedEventsLogUpdateOne {
+	if v != nil {
+		_u.SetChainID(*v)
+	}
+	return _u
+}
+
+// AddChainID adds value to the "chain_id" field.
+func (_u *ParsedEventsLogUpdateOne) AddChainID(v int) *ParsedEventsLogUpdateOne {
+	_u.mutation.AddChainID(v)
 	return _u
 }
 
@@ -427,6 +475,12 @@ func (_u *ParsedEventsLogUpdateOne) sqlSave(ctx context.Context) (_node *ParsedE
 	}
 	if value, ok := _u.mutation.UID(); ok {
 		_spec.SetField(parsedeventslog.FieldUID, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.ChainID(); ok {
+		_spec.SetField(parsedeventslog.FieldChainID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedChainID(); ok {
+		_spec.AddField(parsedeventslog.FieldChainID, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.EventID(); ok {
 		_spec.SetField(parsedeventslog.FieldEventID, field.TypeUUID, value)

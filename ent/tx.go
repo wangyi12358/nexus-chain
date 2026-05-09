@@ -12,10 +12,16 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Chain is the client for interacting with the Chain builders.
+	Chain *ChainClient
+	// ChainNode is the client for interacting with the ChainNode builders.
+	ChainNode *ChainNodeClient
 	// MonitorContract is the client for interacting with the MonitorContract builders.
 	MonitorContract *MonitorContractClient
 	// MonitorEvent is the client for interacting with the MonitorEvent builders.
 	MonitorEvent *MonitorEventClient
+	// MonitorEventCursor is the client for interacting with the MonitorEventCursor builders.
+	MonitorEventCursor *MonitorEventCursorClient
 	// ParsedEventsLog is the client for interacting with the ParsedEventsLog builders.
 	ParsedEventsLog *ParsedEventsLogClient
 
@@ -149,8 +155,11 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Chain = NewChainClient(tx.config)
+	tx.ChainNode = NewChainNodeClient(tx.config)
 	tx.MonitorContract = NewMonitorContractClient(tx.config)
 	tx.MonitorEvent = NewMonitorEventClient(tx.config)
+	tx.MonitorEventCursor = NewMonitorEventCursorClient(tx.config)
 	tx.ParsedEventsLog = NewParsedEventsLogClient(tx.config)
 }
 
@@ -161,7 +170,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: MonitorContract.QueryXXX(), the query will be executed
+// applies a query, for example: Chain.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

@@ -11,8 +11,11 @@ import (
 
 	"nexus-chain/ent/migrate"
 
+	"nexus-chain/ent/chain"
+	"nexus-chain/ent/chainnode"
 	"nexus-chain/ent/monitorcontract"
 	"nexus-chain/ent/monitorevent"
+	"nexus-chain/ent/monitoreventcursor"
 	"nexus-chain/ent/parsedeventslog"
 
 	"entgo.io/ent"
@@ -26,10 +29,16 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Chain is the client for interacting with the Chain builders.
+	Chain *ChainClient
+	// ChainNode is the client for interacting with the ChainNode builders.
+	ChainNode *ChainNodeClient
 	// MonitorContract is the client for interacting with the MonitorContract builders.
 	MonitorContract *MonitorContractClient
 	// MonitorEvent is the client for interacting with the MonitorEvent builders.
 	MonitorEvent *MonitorEventClient
+	// MonitorEventCursor is the client for interacting with the MonitorEventCursor builders.
+	MonitorEventCursor *MonitorEventCursorClient
 	// ParsedEventsLog is the client for interacting with the ParsedEventsLog builders.
 	ParsedEventsLog *ParsedEventsLogClient
 }
@@ -43,8 +52,11 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Chain = NewChainClient(c.config)
+	c.ChainNode = NewChainNodeClient(c.config)
 	c.MonitorContract = NewMonitorContractClient(c.config)
 	c.MonitorEvent = NewMonitorEventClient(c.config)
+	c.MonitorEventCursor = NewMonitorEventCursorClient(c.config)
 	c.ParsedEventsLog = NewParsedEventsLogClient(c.config)
 }
 
@@ -136,11 +148,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		MonitorContract: NewMonitorContractClient(cfg),
-		MonitorEvent:    NewMonitorEventClient(cfg),
-		ParsedEventsLog: NewParsedEventsLogClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		Chain:              NewChainClient(cfg),
+		ChainNode:          NewChainNodeClient(cfg),
+		MonitorContract:    NewMonitorContractClient(cfg),
+		MonitorEvent:       NewMonitorEventClient(cfg),
+		MonitorEventCursor: NewMonitorEventCursorClient(cfg),
+		ParsedEventsLog:    NewParsedEventsLogClient(cfg),
 	}, nil
 }
 
@@ -158,18 +173,21 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		MonitorContract: NewMonitorContractClient(cfg),
-		MonitorEvent:    NewMonitorEventClient(cfg),
-		ParsedEventsLog: NewParsedEventsLogClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		Chain:              NewChainClient(cfg),
+		ChainNode:          NewChainNodeClient(cfg),
+		MonitorContract:    NewMonitorContractClient(cfg),
+		MonitorEvent:       NewMonitorEventClient(cfg),
+		MonitorEventCursor: NewMonitorEventCursorClient(cfg),
+		ParsedEventsLog:    NewParsedEventsLogClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		MonitorContract.
+//		Chain.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -191,30 +209,308 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.MonitorContract.Use(hooks...)
-	c.MonitorEvent.Use(hooks...)
-	c.ParsedEventsLog.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Chain, c.ChainNode, c.MonitorContract, c.MonitorEvent, c.MonitorEventCursor,
+		c.ParsedEventsLog,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.MonitorContract.Intercept(interceptors...)
-	c.MonitorEvent.Intercept(interceptors...)
-	c.ParsedEventsLog.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Chain, c.ChainNode, c.MonitorContract, c.MonitorEvent, c.MonitorEventCursor,
+		c.ParsedEventsLog,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *ChainMutation:
+		return c.Chain.mutate(ctx, m)
+	case *ChainNodeMutation:
+		return c.ChainNode.mutate(ctx, m)
 	case *MonitorContractMutation:
 		return c.MonitorContract.mutate(ctx, m)
 	case *MonitorEventMutation:
 		return c.MonitorEvent.mutate(ctx, m)
+	case *MonitorEventCursorMutation:
+		return c.MonitorEventCursor.mutate(ctx, m)
 	case *ParsedEventsLogMutation:
 		return c.ParsedEventsLog.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// ChainClient is a client for the Chain schema.
+type ChainClient struct {
+	config
+}
+
+// NewChainClient returns a client for the Chain from the given config.
+func NewChainClient(c config) *ChainClient {
+	return &ChainClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `chain.Hooks(f(g(h())))`.
+func (c *ChainClient) Use(hooks ...Hook) {
+	c.hooks.Chain = append(c.hooks.Chain, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `chain.Intercept(f(g(h())))`.
+func (c *ChainClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Chain = append(c.inters.Chain, interceptors...)
+}
+
+// Create returns a builder for creating a Chain entity.
+func (c *ChainClient) Create() *ChainCreate {
+	mutation := newChainMutation(c.config, OpCreate)
+	return &ChainCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Chain entities.
+func (c *ChainClient) CreateBulk(builders ...*ChainCreate) *ChainCreateBulk {
+	return &ChainCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ChainClient) MapCreateBulk(slice any, setFunc func(*ChainCreate, int)) *ChainCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ChainCreateBulk{err: fmt.Errorf("calling to ChainClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ChainCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ChainCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Chain.
+func (c *ChainClient) Update() *ChainUpdate {
+	mutation := newChainMutation(c.config, OpUpdate)
+	return &ChainUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ChainClient) UpdateOne(_m *Chain) *ChainUpdateOne {
+	mutation := newChainMutation(c.config, OpUpdateOne, withChain(_m))
+	return &ChainUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ChainClient) UpdateOneID(id uuid.UUID) *ChainUpdateOne {
+	mutation := newChainMutation(c.config, OpUpdateOne, withChainID(id))
+	return &ChainUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Chain.
+func (c *ChainClient) Delete() *ChainDelete {
+	mutation := newChainMutation(c.config, OpDelete)
+	return &ChainDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ChainClient) DeleteOne(_m *Chain) *ChainDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ChainClient) DeleteOneID(id uuid.UUID) *ChainDeleteOne {
+	builder := c.Delete().Where(chain.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ChainDeleteOne{builder}
+}
+
+// Query returns a query builder for Chain.
+func (c *ChainClient) Query() *ChainQuery {
+	return &ChainQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeChain},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Chain entity by its id.
+func (c *ChainClient) Get(ctx context.Context, id uuid.UUID) (*Chain, error) {
+	return c.Query().Where(chain.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ChainClient) GetX(ctx context.Context, id uuid.UUID) *Chain {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ChainClient) Hooks() []Hook {
+	return c.hooks.Chain
+}
+
+// Interceptors returns the client interceptors.
+func (c *ChainClient) Interceptors() []Interceptor {
+	return c.inters.Chain
+}
+
+func (c *ChainClient) mutate(ctx context.Context, m *ChainMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ChainCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ChainUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ChainUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ChainDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Chain mutation op: %q", m.Op())
+	}
+}
+
+// ChainNodeClient is a client for the ChainNode schema.
+type ChainNodeClient struct {
+	config
+}
+
+// NewChainNodeClient returns a client for the ChainNode from the given config.
+func NewChainNodeClient(c config) *ChainNodeClient {
+	return &ChainNodeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `chainnode.Hooks(f(g(h())))`.
+func (c *ChainNodeClient) Use(hooks ...Hook) {
+	c.hooks.ChainNode = append(c.hooks.ChainNode, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `chainnode.Intercept(f(g(h())))`.
+func (c *ChainNodeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ChainNode = append(c.inters.ChainNode, interceptors...)
+}
+
+// Create returns a builder for creating a ChainNode entity.
+func (c *ChainNodeClient) Create() *ChainNodeCreate {
+	mutation := newChainNodeMutation(c.config, OpCreate)
+	return &ChainNodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ChainNode entities.
+func (c *ChainNodeClient) CreateBulk(builders ...*ChainNodeCreate) *ChainNodeCreateBulk {
+	return &ChainNodeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ChainNodeClient) MapCreateBulk(slice any, setFunc func(*ChainNodeCreate, int)) *ChainNodeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ChainNodeCreateBulk{err: fmt.Errorf("calling to ChainNodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ChainNodeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ChainNodeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ChainNode.
+func (c *ChainNodeClient) Update() *ChainNodeUpdate {
+	mutation := newChainNodeMutation(c.config, OpUpdate)
+	return &ChainNodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ChainNodeClient) UpdateOne(_m *ChainNode) *ChainNodeUpdateOne {
+	mutation := newChainNodeMutation(c.config, OpUpdateOne, withChainNode(_m))
+	return &ChainNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ChainNodeClient) UpdateOneID(id uuid.UUID) *ChainNodeUpdateOne {
+	mutation := newChainNodeMutation(c.config, OpUpdateOne, withChainNodeID(id))
+	return &ChainNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ChainNode.
+func (c *ChainNodeClient) Delete() *ChainNodeDelete {
+	mutation := newChainNodeMutation(c.config, OpDelete)
+	return &ChainNodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ChainNodeClient) DeleteOne(_m *ChainNode) *ChainNodeDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ChainNodeClient) DeleteOneID(id uuid.UUID) *ChainNodeDeleteOne {
+	builder := c.Delete().Where(chainnode.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ChainNodeDeleteOne{builder}
+}
+
+// Query returns a query builder for ChainNode.
+func (c *ChainNodeClient) Query() *ChainNodeQuery {
+	return &ChainNodeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeChainNode},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ChainNode entity by its id.
+func (c *ChainNodeClient) Get(ctx context.Context, id uuid.UUID) (*ChainNode, error) {
+	return c.Query().Where(chainnode.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ChainNodeClient) GetX(ctx context.Context, id uuid.UUID) *ChainNode {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ChainNodeClient) Hooks() []Hook {
+	return c.hooks.ChainNode
+}
+
+// Interceptors returns the client interceptors.
+func (c *ChainNodeClient) Interceptors() []Interceptor {
+	return c.inters.ChainNode
+}
+
+func (c *ChainNodeClient) mutate(ctx context.Context, m *ChainNodeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ChainNodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ChainNodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ChainNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ChainNodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ChainNode mutation op: %q", m.Op())
 	}
 }
 
@@ -484,6 +780,139 @@ func (c *MonitorEventClient) mutate(ctx context.Context, m *MonitorEventMutation
 	}
 }
 
+// MonitorEventCursorClient is a client for the MonitorEventCursor schema.
+type MonitorEventCursorClient struct {
+	config
+}
+
+// NewMonitorEventCursorClient returns a client for the MonitorEventCursor from the given config.
+func NewMonitorEventCursorClient(c config) *MonitorEventCursorClient {
+	return &MonitorEventCursorClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `monitoreventcursor.Hooks(f(g(h())))`.
+func (c *MonitorEventCursorClient) Use(hooks ...Hook) {
+	c.hooks.MonitorEventCursor = append(c.hooks.MonitorEventCursor, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `monitoreventcursor.Intercept(f(g(h())))`.
+func (c *MonitorEventCursorClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MonitorEventCursor = append(c.inters.MonitorEventCursor, interceptors...)
+}
+
+// Create returns a builder for creating a MonitorEventCursor entity.
+func (c *MonitorEventCursorClient) Create() *MonitorEventCursorCreate {
+	mutation := newMonitorEventCursorMutation(c.config, OpCreate)
+	return &MonitorEventCursorCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MonitorEventCursor entities.
+func (c *MonitorEventCursorClient) CreateBulk(builders ...*MonitorEventCursorCreate) *MonitorEventCursorCreateBulk {
+	return &MonitorEventCursorCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MonitorEventCursorClient) MapCreateBulk(slice any, setFunc func(*MonitorEventCursorCreate, int)) *MonitorEventCursorCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MonitorEventCursorCreateBulk{err: fmt.Errorf("calling to MonitorEventCursorClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MonitorEventCursorCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MonitorEventCursorCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MonitorEventCursor.
+func (c *MonitorEventCursorClient) Update() *MonitorEventCursorUpdate {
+	mutation := newMonitorEventCursorMutation(c.config, OpUpdate)
+	return &MonitorEventCursorUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MonitorEventCursorClient) UpdateOne(_m *MonitorEventCursor) *MonitorEventCursorUpdateOne {
+	mutation := newMonitorEventCursorMutation(c.config, OpUpdateOne, withMonitorEventCursor(_m))
+	return &MonitorEventCursorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MonitorEventCursorClient) UpdateOneID(id uuid.UUID) *MonitorEventCursorUpdateOne {
+	mutation := newMonitorEventCursorMutation(c.config, OpUpdateOne, withMonitorEventCursorID(id))
+	return &MonitorEventCursorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MonitorEventCursor.
+func (c *MonitorEventCursorClient) Delete() *MonitorEventCursorDelete {
+	mutation := newMonitorEventCursorMutation(c.config, OpDelete)
+	return &MonitorEventCursorDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MonitorEventCursorClient) DeleteOne(_m *MonitorEventCursor) *MonitorEventCursorDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MonitorEventCursorClient) DeleteOneID(id uuid.UUID) *MonitorEventCursorDeleteOne {
+	builder := c.Delete().Where(monitoreventcursor.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MonitorEventCursorDeleteOne{builder}
+}
+
+// Query returns a query builder for MonitorEventCursor.
+func (c *MonitorEventCursorClient) Query() *MonitorEventCursorQuery {
+	return &MonitorEventCursorQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMonitorEventCursor},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MonitorEventCursor entity by its id.
+func (c *MonitorEventCursorClient) Get(ctx context.Context, id uuid.UUID) (*MonitorEventCursor, error) {
+	return c.Query().Where(monitoreventcursor.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MonitorEventCursorClient) GetX(ctx context.Context, id uuid.UUID) *MonitorEventCursor {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *MonitorEventCursorClient) Hooks() []Hook {
+	return c.hooks.MonitorEventCursor
+}
+
+// Interceptors returns the client interceptors.
+func (c *MonitorEventCursorClient) Interceptors() []Interceptor {
+	return c.inters.MonitorEventCursor
+}
+
+func (c *MonitorEventCursorClient) mutate(ctx context.Context, m *MonitorEventCursorMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MonitorEventCursorCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MonitorEventCursorUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MonitorEventCursorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MonitorEventCursorDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MonitorEventCursor mutation op: %q", m.Op())
+	}
+}
+
 // ParsedEventsLogClient is a client for the ParsedEventsLog schema.
 type ParsedEventsLogClient struct {
 	config
@@ -620,9 +1049,11 @@ func (c *ParsedEventsLogClient) mutate(ctx context.Context, m *ParsedEventsLogMu
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		MonitorContract, MonitorEvent, ParsedEventsLog []ent.Hook
+		Chain, ChainNode, MonitorContract, MonitorEvent, MonitorEventCursor,
+		ParsedEventsLog []ent.Hook
 	}
 	inters struct {
-		MonitorContract, MonitorEvent, ParsedEventsLog []ent.Interceptor
+		Chain, ChainNode, MonitorContract, MonitorEvent, MonitorEventCursor,
+		ParsedEventsLog []ent.Interceptor
 	}
 )

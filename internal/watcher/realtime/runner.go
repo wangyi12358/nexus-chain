@@ -6,14 +6,14 @@ import (
 	"log"
 	"time"
 
-	"nexus-chain/internal/monitoring/shared"
+	"nexus-chain/internal/watcher/core"
 	ethutil "nexus-chain/pkg/ethereum"
 
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func (l *EventListener) runSubscriptionLoop(ctx context.Context, sub *shared.EventSubscription) {
+func (l *EventListener) runSubscriptionLoop(ctx context.Context, sub *core.EventSubscription) {
 	for {
 		if err := l.subscribeOnce(ctx, sub); err != nil && ctx.Err() == nil {
 			log.Printf(
@@ -32,8 +32,8 @@ func (l *EventListener) runSubscriptionLoop(ctx context.Context, sub *shared.Eve
 	}
 }
 
-func (l *EventListener) subscribeOnce(ctx context.Context, sub *shared.EventSubscription) error {
-	client, err := ethclient.DialContext(ctx, sub.WSURL)
+func (l *EventListener) subscribeOnce(ctx context.Context, sub *core.EventSubscription) error {
+	client, err := ethclient.DialContext(ctx, sub.WsUrl)
 	if err != nil {
 		return fmt.Errorf("dial websocket rpc: %w", err)
 	}
@@ -57,7 +57,7 @@ func (l *EventListener) subscribeOnce(ctx context.Context, sub *shared.EventSubs
 			}
 			return err
 		case vLog := <-logsCh:
-			if err := shared.ProcessRealtimeLog(ctx, l.db, l.rabbitmqClient, sub, vLog); err != nil {
+			if err := core.ProcessRealtimeLog(ctx, l.db, l.rabbitmqClient, sub, vLog); err != nil {
 				log.Printf(
 					"failed to handle log for contract=%s event=%s tx=%s log_index=%d: %v",
 					sub.Contract.Address,

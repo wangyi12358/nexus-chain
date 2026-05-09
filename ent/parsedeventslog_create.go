@@ -30,6 +30,20 @@ func (_c *ParsedEventsLogCreate) SetUID(v string) *ParsedEventsLogCreate {
 	return _c
 }
 
+// SetChainID sets the "chain_id" field.
+func (_c *ParsedEventsLogCreate) SetChainID(v int) *ParsedEventsLogCreate {
+	_c.mutation.SetChainID(v)
+	return _c
+}
+
+// SetNillableChainID sets the "chain_id" field if the given value is not nil.
+func (_c *ParsedEventsLogCreate) SetNillableChainID(v *int) *ParsedEventsLogCreate {
+	if v != nil {
+		_c.SetChainID(*v)
+	}
+	return _c
+}
+
 // SetEventID sets the "event_id" field.
 func (_c *ParsedEventsLogCreate) SetEventID(v uuid.UUID) *ParsedEventsLogCreate {
 	_c.mutation.SetEventID(v)
@@ -123,6 +137,10 @@ func (_c *ParsedEventsLogCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ParsedEventsLogCreate) defaults() {
+	if _, ok := _c.mutation.ChainID(); !ok {
+		v := parsedeventslog.DefaultChainID
+		_c.mutation.SetChainID(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := parsedeventslog.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -142,6 +160,9 @@ func (_c *ParsedEventsLogCreate) check() error {
 		if err := parsedeventslog.UIDValidator(v); err != nil {
 			return &ValidationError{Name: "uid", err: fmt.Errorf(`ent: validator failed for field "ParsedEventsLog.uid": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.ChainID(); !ok {
+		return &ValidationError{Name: "chain_id", err: errors.New(`ent: missing required field "ParsedEventsLog.chain_id"`)}
 	}
 	if _, ok := _c.mutation.EventID(); !ok {
 		return &ValidationError{Name: "event_id", err: errors.New(`ent: missing required field "ParsedEventsLog.event_id"`)}
@@ -210,6 +231,10 @@ func (_c *ParsedEventsLogCreate) createSpec() (*ParsedEventsLog, *sqlgraph.Creat
 	if value, ok := _c.mutation.UID(); ok {
 		_spec.SetField(parsedeventslog.FieldUID, field.TypeString, value)
 		_node.UID = value
+	}
+	if value, ok := _c.mutation.ChainID(); ok {
+		_spec.SetField(parsedeventslog.FieldChainID, field.TypeInt, value)
+		_node.ChainID = value
 	}
 	if value, ok := _c.mutation.EventID(); ok {
 		_spec.SetField(parsedeventslog.FieldEventID, field.TypeUUID, value)
@@ -296,6 +321,24 @@ func (u *ParsedEventsLogUpsert) SetUID(v string) *ParsedEventsLogUpsert {
 // UpdateUID sets the "uid" field to the value that was provided on create.
 func (u *ParsedEventsLogUpsert) UpdateUID() *ParsedEventsLogUpsert {
 	u.SetExcluded(parsedeventslog.FieldUID)
+	return u
+}
+
+// SetChainID sets the "chain_id" field.
+func (u *ParsedEventsLogUpsert) SetChainID(v int) *ParsedEventsLogUpsert {
+	u.Set(parsedeventslog.FieldChainID, v)
+	return u
+}
+
+// UpdateChainID sets the "chain_id" field to the value that was provided on create.
+func (u *ParsedEventsLogUpsert) UpdateChainID() *ParsedEventsLogUpsert {
+	u.SetExcluded(parsedeventslog.FieldChainID)
+	return u
+}
+
+// AddChainID adds v to the "chain_id" field.
+func (u *ParsedEventsLogUpsert) AddChainID(v int) *ParsedEventsLogUpsert {
+	u.Add(parsedeventslog.FieldChainID, v)
 	return u
 }
 
@@ -433,6 +476,27 @@ func (u *ParsedEventsLogUpsertOne) SetUID(v string) *ParsedEventsLogUpsertOne {
 func (u *ParsedEventsLogUpsertOne) UpdateUID() *ParsedEventsLogUpsertOne {
 	return u.Update(func(s *ParsedEventsLogUpsert) {
 		s.UpdateUID()
+	})
+}
+
+// SetChainID sets the "chain_id" field.
+func (u *ParsedEventsLogUpsertOne) SetChainID(v int) *ParsedEventsLogUpsertOne {
+	return u.Update(func(s *ParsedEventsLogUpsert) {
+		s.SetChainID(v)
+	})
+}
+
+// AddChainID adds v to the "chain_id" field.
+func (u *ParsedEventsLogUpsertOne) AddChainID(v int) *ParsedEventsLogUpsertOne {
+	return u.Update(func(s *ParsedEventsLogUpsert) {
+		s.AddChainID(v)
+	})
+}
+
+// UpdateChainID sets the "chain_id" field to the value that was provided on create.
+func (u *ParsedEventsLogUpsertOne) UpdateChainID() *ParsedEventsLogUpsertOne {
+	return u.Update(func(s *ParsedEventsLogUpsert) {
+		s.UpdateChainID()
 	})
 }
 
@@ -749,6 +813,27 @@ func (u *ParsedEventsLogUpsertBulk) SetUID(v string) *ParsedEventsLogUpsertBulk 
 func (u *ParsedEventsLogUpsertBulk) UpdateUID() *ParsedEventsLogUpsertBulk {
 	return u.Update(func(s *ParsedEventsLogUpsert) {
 		s.UpdateUID()
+	})
+}
+
+// SetChainID sets the "chain_id" field.
+func (u *ParsedEventsLogUpsertBulk) SetChainID(v int) *ParsedEventsLogUpsertBulk {
+	return u.Update(func(s *ParsedEventsLogUpsert) {
+		s.SetChainID(v)
+	})
+}
+
+// AddChainID adds v to the "chain_id" field.
+func (u *ParsedEventsLogUpsertBulk) AddChainID(v int) *ParsedEventsLogUpsertBulk {
+	return u.Update(func(s *ParsedEventsLogUpsert) {
+		s.AddChainID(v)
+	})
+}
+
+// UpdateChainID sets the "chain_id" field to the value that was provided on create.
+func (u *ParsedEventsLogUpsertBulk) UpdateChainID() *ParsedEventsLogUpsertBulk {
+	return u.Update(func(s *ParsedEventsLogUpsert) {
+		s.UpdateChainID()
 	})
 }
 

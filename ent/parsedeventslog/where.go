@@ -60,6 +60,11 @@ func UID(v string) predicate.ParsedEventsLog {
 	return predicate.ParsedEventsLog(sql.FieldEQ(FieldUID, v))
 }
 
+// ChainID applies equality check predicate on the "chain_id" field. It's identical to ChainIDEQ.
+func ChainID(v int) predicate.ParsedEventsLog {
+	return predicate.ParsedEventsLog(sql.FieldEQ(FieldChainID, v))
+}
+
 // EventID applies equality check predicate on the "event_id" field. It's identical to EventIDEQ.
 func EventID(v uuid.UUID) predicate.ParsedEventsLog {
 	return predicate.ParsedEventsLog(sql.FieldEQ(FieldEventID, v))
@@ -148,6 +153,46 @@ func UIDEqualFold(v string) predicate.ParsedEventsLog {
 // UIDContainsFold applies the ContainsFold predicate on the "uid" field.
 func UIDContainsFold(v string) predicate.ParsedEventsLog {
 	return predicate.ParsedEventsLog(sql.FieldContainsFold(FieldUID, v))
+}
+
+// ChainIDEQ applies the EQ predicate on the "chain_id" field.
+func ChainIDEQ(v int) predicate.ParsedEventsLog {
+	return predicate.ParsedEventsLog(sql.FieldEQ(FieldChainID, v))
+}
+
+// ChainIDNEQ applies the NEQ predicate on the "chain_id" field.
+func ChainIDNEQ(v int) predicate.ParsedEventsLog {
+	return predicate.ParsedEventsLog(sql.FieldNEQ(FieldChainID, v))
+}
+
+// ChainIDIn applies the In predicate on the "chain_id" field.
+func ChainIDIn(vs ...int) predicate.ParsedEventsLog {
+	return predicate.ParsedEventsLog(sql.FieldIn(FieldChainID, vs...))
+}
+
+// ChainIDNotIn applies the NotIn predicate on the "chain_id" field.
+func ChainIDNotIn(vs ...int) predicate.ParsedEventsLog {
+	return predicate.ParsedEventsLog(sql.FieldNotIn(FieldChainID, vs...))
+}
+
+// ChainIDGT applies the GT predicate on the "chain_id" field.
+func ChainIDGT(v int) predicate.ParsedEventsLog {
+	return predicate.ParsedEventsLog(sql.FieldGT(FieldChainID, v))
+}
+
+// ChainIDGTE applies the GTE predicate on the "chain_id" field.
+func ChainIDGTE(v int) predicate.ParsedEventsLog {
+	return predicate.ParsedEventsLog(sql.FieldGTE(FieldChainID, v))
+}
+
+// ChainIDLT applies the LT predicate on the "chain_id" field.
+func ChainIDLT(v int) predicate.ParsedEventsLog {
+	return predicate.ParsedEventsLog(sql.FieldLT(FieldChainID, v))
+}
+
+// ChainIDLTE applies the LTE predicate on the "chain_id" field.
+func ChainIDLTE(v int) predicate.ParsedEventsLog {
+	return predicate.ParsedEventsLog(sql.FieldLTE(FieldChainID, v))
 }
 
 // EventIDEQ applies the EQ predicate on the "event_id" field.

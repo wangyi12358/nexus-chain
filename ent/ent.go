@@ -6,8 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"nexus-chain/ent/chain"
+	"nexus-chain/ent/chainnode"
 	"nexus-chain/ent/monitorcontract"
 	"nexus-chain/ent/monitorevent"
+	"nexus-chain/ent/monitoreventcursor"
 	"nexus-chain/ent/parsedeventslog"
 	"reflect"
 	"sync"
@@ -75,9 +78,12 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			monitorcontract.Table: monitorcontract.ValidColumn,
-			monitorevent.Table:    monitorevent.ValidColumn,
-			parsedeventslog.Table: parsedeventslog.ValidColumn,
+			chain.Table:              chain.ValidColumn,
+			chainnode.Table:          chainnode.ValidColumn,
+			monitorcontract.Table:    monitorcontract.ValidColumn,
+			monitorevent.Table:       monitorevent.ValidColumn,
+			monitoreventcursor.Table: monitoreventcursor.ValidColumn,
+			parsedeventslog.Table:    parsedeventslog.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

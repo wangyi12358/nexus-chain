@@ -92,27 +92,6 @@ func (_u *MonitorEventUpdate) AddStatus(v int8) *MonitorEventUpdate {
 	return _u
 }
 
-// SetLastBlock sets the "last_block" field.
-func (_u *MonitorEventUpdate) SetLastBlock(v int64) *MonitorEventUpdate {
-	_u.mutation.ResetLastBlock()
-	_u.mutation.SetLastBlock(v)
-	return _u
-}
-
-// SetNillableLastBlock sets the "last_block" field if the given value is not nil.
-func (_u *MonitorEventUpdate) SetNillableLastBlock(v *int64) *MonitorEventUpdate {
-	if v != nil {
-		_u.SetLastBlock(*v)
-	}
-	return _u
-}
-
-// AddLastBlock adds value to the "last_block" field.
-func (_u *MonitorEventUpdate) AddLastBlock(v int64) *MonitorEventUpdate {
-	_u.mutation.AddLastBlock(v)
-	return _u
-}
-
 // Mutation returns the MonitorEventMutation object of the builder.
 func (_u *MonitorEventUpdate) Mutation() *MonitorEventMutation {
 	return _u.mutation
@@ -192,12 +171,6 @@ func (_u *MonitorEventUpdate) sqlSave(ctx context.Context) (_node int, err error
 	}
 	if value, ok := _u.mutation.AddedStatus(); ok {
 		_spec.AddField(monitorevent.FieldStatus, field.TypeInt8, value)
-	}
-	if value, ok := _u.mutation.LastBlock(); ok {
-		_spec.SetField(monitorevent.FieldLastBlock, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedLastBlock(); ok {
-		_spec.AddField(monitorevent.FieldLastBlock, field.TypeInt64, value)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
@@ -281,27 +254,6 @@ func (_u *MonitorEventUpdateOne) SetNillableStatus(v *int8) *MonitorEventUpdateO
 // AddStatus adds value to the "status" field.
 func (_u *MonitorEventUpdateOne) AddStatus(v int8) *MonitorEventUpdateOne {
 	_u.mutation.AddStatus(v)
-	return _u
-}
-
-// SetLastBlock sets the "last_block" field.
-func (_u *MonitorEventUpdateOne) SetLastBlock(v int64) *MonitorEventUpdateOne {
-	_u.mutation.ResetLastBlock()
-	_u.mutation.SetLastBlock(v)
-	return _u
-}
-
-// SetNillableLastBlock sets the "last_block" field if the given value is not nil.
-func (_u *MonitorEventUpdateOne) SetNillableLastBlock(v *int64) *MonitorEventUpdateOne {
-	if v != nil {
-		_u.SetLastBlock(*v)
-	}
-	return _u
-}
-
-// AddLastBlock adds value to the "last_block" field.
-func (_u *MonitorEventUpdateOne) AddLastBlock(v int64) *MonitorEventUpdateOne {
-	_u.mutation.AddLastBlock(v)
 	return _u
 }
 
@@ -414,12 +366,6 @@ func (_u *MonitorEventUpdateOne) sqlSave(ctx context.Context) (_node *MonitorEve
 	}
 	if value, ok := _u.mutation.AddedStatus(); ok {
 		_spec.AddField(monitorevent.FieldStatus, field.TypeInt8, value)
-	}
-	if value, ok := _u.mutation.LastBlock(); ok {
-		_spec.SetField(monitorevent.FieldLastBlock, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedLastBlock(); ok {
-		_spec.AddField(monitorevent.FieldLastBlock, field.TypeInt64, value)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	_node = &MonitorEvent{config: _u.config}

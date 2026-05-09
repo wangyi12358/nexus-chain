@@ -74,11 +74,6 @@ func Status(v int8) predicate.MonitorEvent {
 	return predicate.MonitorEvent(sql.FieldEQ(FieldStatus, v))
 }
 
-// LastBlock applies equality check predicate on the "last_block" field. It's identical to LastBlockEQ.
-func LastBlock(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldEQ(FieldLastBlock, v))
-}
-
 // ContractIDEQ applies the EQ predicate on the "contract_id" field.
 func ContractIDEQ(v uuid.UUID) predicate.MonitorEvent {
 	return predicate.MonitorEvent(sql.FieldEQ(FieldContractID, v))
@@ -287,46 +282,6 @@ func StatusLT(v int8) predicate.MonitorEvent {
 // StatusLTE applies the LTE predicate on the "status" field.
 func StatusLTE(v int8) predicate.MonitorEvent {
 	return predicate.MonitorEvent(sql.FieldLTE(FieldStatus, v))
-}
-
-// LastBlockEQ applies the EQ predicate on the "last_block" field.
-func LastBlockEQ(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldEQ(FieldLastBlock, v))
-}
-
-// LastBlockNEQ applies the NEQ predicate on the "last_block" field.
-func LastBlockNEQ(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldNEQ(FieldLastBlock, v))
-}
-
-// LastBlockIn applies the In predicate on the "last_block" field.
-func LastBlockIn(vs ...int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldIn(FieldLastBlock, vs...))
-}
-
-// LastBlockNotIn applies the NotIn predicate on the "last_block" field.
-func LastBlockNotIn(vs ...int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldNotIn(FieldLastBlock, vs...))
-}
-
-// LastBlockGT applies the GT predicate on the "last_block" field.
-func LastBlockGT(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldGT(FieldLastBlock, v))
-}
-
-// LastBlockGTE applies the GTE predicate on the "last_block" field.
-func LastBlockGTE(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldGTE(FieldLastBlock, v))
-}
-
-// LastBlockLT applies the LT predicate on the "last_block" field.
-func LastBlockLT(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldLT(FieldLastBlock, v))
-}
-
-// LastBlockLTE applies the LTE predicate on the "last_block" field.
-func LastBlockLTE(v int64) predicate.MonitorEvent {
-	return predicate.MonitorEvent(sql.FieldLTE(FieldLastBlock, v))
 }
 
 // And groups predicates with the AND operator between them.

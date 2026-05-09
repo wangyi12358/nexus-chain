@@ -1,4 +1,4 @@
-package shared
+package core
 
 import (
 	"context"
@@ -95,6 +95,7 @@ func insertParsedEventLog(
 ) (*ent.ParsedEventsLog, bool, error) {
 	entity, err := db.ParsedEventsLog.Create().
 		SetUID(uid).
+		SetChainID(sub.Contract.ChainID).
 		SetEventID(sub.Event.ID).
 		SetBlockNumber(int64(vLog.BlockNumber)).
 		SetTxHash(vLog.TxHash.Hex()).

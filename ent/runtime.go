@@ -3,8 +3,11 @@
 package ent
 
 import (
+	"nexus-chain/ent/chain"
+	"nexus-chain/ent/chainnode"
 	"nexus-chain/ent/monitorcontract"
 	"nexus-chain/ent/monitorevent"
+	"nexus-chain/ent/monitoreventcursor"
 	"nexus-chain/ent/parsedeventslog"
 	"nexus-chain/ent/schema"
 	"time"
@@ -16,6 +19,82 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	chainFields := schema.Chain{}.Fields()
+	_ = chainFields
+	// chainDescChainID is the schema descriptor for chain_id field.
+	chainDescChainID := chainFields[1].Descriptor()
+	// chain.ChainIDValidator is a validator for the "chain_id" field. It is called by the builders before save.
+	chain.ChainIDValidator = chainDescChainID.Validators[0].(func(int) error)
+	// chainDescName is the schema descriptor for name field.
+	chainDescName := chainFields[2].Descriptor()
+	// chain.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	chain.NameValidator = chainDescName.Validators[0].(func(string) error)
+	// chainDescNativeSymbol is the schema descriptor for native_symbol field.
+	chainDescNativeSymbol := chainFields[3].Descriptor()
+	// chain.NativeSymbolValidator is a validator for the "native_symbol" field. It is called by the builders before save.
+	chain.NativeSymbolValidator = chainDescNativeSymbol.Validators[0].(func(string) error)
+	// chainDescConfirmations is the schema descriptor for confirmations field.
+	chainDescConfirmations := chainFields[4].Descriptor()
+	// chain.DefaultConfirmations holds the default value on creation for the confirmations field.
+	chain.DefaultConfirmations = chainDescConfirmations.Default.(int)
+	// chainDescScanBatchSize is the schema descriptor for scan_batch_size field.
+	chainDescScanBatchSize := chainFields[5].Descriptor()
+	// chain.DefaultScanBatchSize holds the default value on creation for the scan_batch_size field.
+	chain.DefaultScanBatchSize = chainDescScanBatchSize.Default.(int)
+	// chainDescStatus is the schema descriptor for status field.
+	chainDescStatus := chainFields[6].Descriptor()
+	// chain.DefaultStatus holds the default value on creation for the status field.
+	chain.DefaultStatus = chainDescStatus.Default.(int8)
+	// chainDescCreatedAt is the schema descriptor for created_at field.
+	chainDescCreatedAt := chainFields[7].Descriptor()
+	// chain.DefaultCreatedAt holds the default value on creation for the created_at field.
+	chain.DefaultCreatedAt = chainDescCreatedAt.Default.(func() time.Time)
+	// chainDescUpdatedAt is the schema descriptor for updated_at field.
+	chainDescUpdatedAt := chainFields[8].Descriptor()
+	// chain.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	chain.DefaultUpdatedAt = chainDescUpdatedAt.Default.(func() time.Time)
+	// chain.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	chain.UpdateDefaultUpdatedAt = chainDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// chainDescID is the schema descriptor for id field.
+	chainDescID := chainFields[0].Descriptor()
+	// chain.DefaultID holds the default value on creation for the id field.
+	chain.DefaultID = chainDescID.Default.(func() uuid.UUID)
+	chainnodeFields := schema.ChainNode{}.Fields()
+	_ = chainnodeFields
+	// chainnodeDescNodeType is the schema descriptor for node_type field.
+	chainnodeDescNodeType := chainnodeFields[2].Descriptor()
+	// chainnode.NodeTypeValidator is a validator for the "node_type" field. It is called by the builders before save.
+	chainnode.NodeTypeValidator = chainnodeDescNodeType.Validators[0].(func(string) error)
+	// chainnodeDescName is the schema descriptor for name field.
+	chainnodeDescName := chainnodeFields[3].Descriptor()
+	// chainnode.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	chainnode.NameValidator = chainnodeDescName.Validators[0].(func(string) error)
+	// chainnodeDescURL is the schema descriptor for url field.
+	chainnodeDescURL := chainnodeFields[4].Descriptor()
+	// chainnode.URLValidator is a validator for the "url" field. It is called by the builders before save.
+	chainnode.URLValidator = chainnodeDescURL.Validators[0].(func(string) error)
+	// chainnodeDescPriority is the schema descriptor for priority field.
+	chainnodeDescPriority := chainnodeFields[5].Descriptor()
+	// chainnode.DefaultPriority holds the default value on creation for the priority field.
+	chainnode.DefaultPriority = chainnodeDescPriority.Default.(int)
+	// chainnodeDescStatus is the schema descriptor for status field.
+	chainnodeDescStatus := chainnodeFields[6].Descriptor()
+	// chainnode.DefaultStatus holds the default value on creation for the status field.
+	chainnode.DefaultStatus = chainnodeDescStatus.Default.(int8)
+	// chainnodeDescCreatedAt is the schema descriptor for created_at field.
+	chainnodeDescCreatedAt := chainnodeFields[7].Descriptor()
+	// chainnode.DefaultCreatedAt holds the default value on creation for the created_at field.
+	chainnode.DefaultCreatedAt = chainnodeDescCreatedAt.Default.(func() time.Time)
+	// chainnodeDescUpdatedAt is the schema descriptor for updated_at field.
+	chainnodeDescUpdatedAt := chainnodeFields[8].Descriptor()
+	// chainnode.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	chainnode.DefaultUpdatedAt = chainnodeDescUpdatedAt.Default.(func() time.Time)
+	// chainnode.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	chainnode.UpdateDefaultUpdatedAt = chainnodeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// chainnodeDescID is the schema descriptor for id field.
+	chainnodeDescID := chainnodeFields[0].Descriptor()
+	// chainnode.DefaultID holds the default value on creation for the id field.
+	chainnode.DefaultID = chainnodeDescID.Default.(func() uuid.UUID)
 	monitorcontractFields := schema.MonitorContract{}.Fields()
 	_ = monitorcontractFields
 	// monitorcontractDescAddress is the schema descriptor for address field.
@@ -26,8 +105,12 @@ func init() {
 	monitorcontractDescName := monitorcontractFields[3].Descriptor()
 	// monitorcontract.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	monitorcontract.NameValidator = monitorcontractDescName.Validators[0].(func(string) error)
+	// monitorcontractDescDeployedBlock is the schema descriptor for deployed_block field.
+	monitorcontractDescDeployedBlock := monitorcontractFields[5].Descriptor()
+	// monitorcontract.DefaultDeployedBlock holds the default value on creation for the deployed_block field.
+	monitorcontract.DefaultDeployedBlock = monitorcontractDescDeployedBlock.Default.(int64)
 	// monitorcontractDescStatus is the schema descriptor for status field.
-	monitorcontractDescStatus := monitorcontractFields[5].Descriptor()
+	monitorcontractDescStatus := monitorcontractFields[6].Descriptor()
 	// monitorcontract.DefaultStatus holds the default value on creation for the status field.
 	monitorcontract.DefaultStatus = monitorcontractDescStatus.Default.(int8)
 	// monitorcontractDescID is the schema descriptor for id field.
@@ -48,22 +131,42 @@ func init() {
 	monitoreventDescStatus := monitoreventFields[4].Descriptor()
 	// monitorevent.DefaultStatus holds the default value on creation for the status field.
 	monitorevent.DefaultStatus = monitoreventDescStatus.Default.(int8)
-	// monitoreventDescLastBlock is the schema descriptor for last_block field.
-	monitoreventDescLastBlock := monitoreventFields[5].Descriptor()
-	// monitorevent.DefaultLastBlock holds the default value on creation for the last_block field.
-	monitorevent.DefaultLastBlock = monitoreventDescLastBlock.Default.(int64)
 	// monitoreventDescID is the schema descriptor for id field.
 	monitoreventDescID := monitoreventFields[0].Descriptor()
 	// monitorevent.DefaultID holds the default value on creation for the id field.
 	monitorevent.DefaultID = monitoreventDescID.Default.(func() uuid.UUID)
+	monitoreventcursorFields := schema.MonitorEventCursor{}.Fields()
+	_ = monitoreventcursorFields
+	// monitoreventcursorDescScanLastBlock is the schema descriptor for scan_last_block field.
+	monitoreventcursorDescScanLastBlock := monitoreventcursorFields[2].Descriptor()
+	// monitoreventcursor.DefaultScanLastBlock holds the default value on creation for the scan_last_block field.
+	monitoreventcursor.DefaultScanLastBlock = monitoreventcursorDescScanLastBlock.Default.(int64)
+	// monitoreventcursorDescCreatedAt is the schema descriptor for created_at field.
+	monitoreventcursorDescCreatedAt := monitoreventcursorFields[4].Descriptor()
+	// monitoreventcursor.DefaultCreatedAt holds the default value on creation for the created_at field.
+	monitoreventcursor.DefaultCreatedAt = monitoreventcursorDescCreatedAt.Default.(func() time.Time)
+	// monitoreventcursorDescUpdatedAt is the schema descriptor for updated_at field.
+	monitoreventcursorDescUpdatedAt := monitoreventcursorFields[5].Descriptor()
+	// monitoreventcursor.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	monitoreventcursor.DefaultUpdatedAt = monitoreventcursorDescUpdatedAt.Default.(func() time.Time)
+	// monitoreventcursor.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	monitoreventcursor.UpdateDefaultUpdatedAt = monitoreventcursorDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// monitoreventcursorDescID is the schema descriptor for id field.
+	monitoreventcursorDescID := monitoreventcursorFields[0].Descriptor()
+	// monitoreventcursor.DefaultID holds the default value on creation for the id field.
+	monitoreventcursor.DefaultID = monitoreventcursorDescID.Default.(func() uuid.UUID)
 	parsedeventslogFields := schema.ParsedEventsLog{}.Fields()
 	_ = parsedeventslogFields
 	// parsedeventslogDescUID is the schema descriptor for uid field.
 	parsedeventslogDescUID := parsedeventslogFields[1].Descriptor()
 	// parsedeventslog.UIDValidator is a validator for the "uid" field. It is called by the builders before save.
 	parsedeventslog.UIDValidator = parsedeventslogDescUID.Validators[0].(func(string) error)
+	// parsedeventslogDescChainID is the schema descriptor for chain_id field.
+	parsedeventslogDescChainID := parsedeventslogFields[2].Descriptor()
+	// parsedeventslog.DefaultChainID holds the default value on creation for the chain_id field.
+	parsedeventslog.DefaultChainID = parsedeventslogDescChainID.Default.(int)
 	// parsedeventslogDescTxHash is the schema descriptor for tx_hash field.
-	parsedeventslogDescTxHash := parsedeventslogFields[4].Descriptor()
+	parsedeventslogDescTxHash := parsedeventslogFields[5].Descriptor()
 	// parsedeventslog.TxHashValidator is a validator for the "tx_hash" field. It is called by the builders before save.
 	parsedeventslog.TxHashValidator = func() func(string) error {
 		validators := parsedeventslogDescTxHash.Validators
@@ -81,11 +184,11 @@ func init() {
 		}
 	}()
 	// parsedeventslogDescLogIndex is the schema descriptor for log_index field.
-	parsedeventslogDescLogIndex := parsedeventslogFields[5].Descriptor()
+	parsedeventslogDescLogIndex := parsedeventslogFields[6].Descriptor()
 	// parsedeventslog.LogIndexValidator is a validator for the "log_index" field. It is called by the builders before save.
 	parsedeventslog.LogIndexValidator = parsedeventslogDescLogIndex.Validators[0].(func(int64) error)
 	// parsedeventslogDescCreatedAt is the schema descriptor for created_at field.
-	parsedeventslogDescCreatedAt := parsedeventslogFields[7].Descriptor()
+	parsedeventslogDescCreatedAt := parsedeventslogFields[8].Descriptor()
 	// parsedeventslog.DefaultCreatedAt holds the default value on creation for the created_at field.
 	parsedeventslog.DefaultCreatedAt = parsedeventslogDescCreatedAt.Default.(func() time.Time)
 	// parsedeventslogDescID is the schema descriptor for id field.

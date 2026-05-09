@@ -25,9 +25,7 @@ type MonitorEvent struct {
 	// MQ routing key for this event
 	MqRoutingKey string `json:"mq_routing_key,omitempty"`
 	// Whether to enable monitoring (0: stop, 1: run)
-	Status int8 `json:"status,omitempty"`
-	// Last processed block number
-	LastBlock    int64 `json:"last_block,omitempty"`
+	Status       int8 `json:"status,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -36,7 +34,7 @@ func (*MonitorEvent) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case monitorevent.FieldStatus, monitorevent.FieldLastBlock:
+		case monitorevent.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case monitorevent.FieldEventName, monitorevent.FieldMqRoutingKey:
 			values[i] = new(sql.NullString)
@@ -87,12 +85,6 @@ func (_m *MonitorEvent) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Status = int8(value.Int64)
 			}
-		case monitorevent.FieldLastBlock:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field last_block", values[i])
-			} else if value.Valid {
-				_m.LastBlock = value.Int64
-			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -140,9 +132,6 @@ func (_m *MonitorEvent) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Status))
-	builder.WriteString(", ")
-	builder.WriteString("last_block=")
-	builder.WriteString(fmt.Sprintf("%v", _m.LastBlock))
 	builder.WriteByte(')')
 	return builder.String()
 }
